@@ -1,22 +1,26 @@
-use crate::Tokens;
+mod token;
 
 pub mod tokenizer
 {
-	pub fn tokenize(&str) -> Vec<Token> { }
+	pub use crate::token::Token;
+
+	pub fn tokenize(input: &str) -> Vec<Token> { vec!() }
 
 	// helpers
-	fn tokenize_int(&str) -> Option<Token.int_tk> { }
-	fn tokenize_bool(&str) -> Option<Token.bool_tk> { }
-	fn tokenize_str(&str) -> Option<Token.str_tk> { }
-	fn tokenize_var_or_keyword(&str) -> Option<Token> { }
+	fn tokenize_int(word: &str) -> Option<Token> { None }
+	fn tokenize_bool(word: &str) -> Option<Token> { None }
+	fn tokenize_str(word: &str) -> Option<Token> { None }
+	fn tokenize_var_or_keyword(word: &str) -> Option<Token> { None }
 	
 	// takes some iterator and modifies it
-	// fn skip_whitespace(&mut iterator) { }
+	fn skip_whitespace(iter: &mut str) { }
 }
 
 #[cfg(tests)]
 pub mod tests
 {
+	use self::tokenizer;
+
 	#[test]
 	fn dummy_test() {
 		assert_eq!(true, true)
