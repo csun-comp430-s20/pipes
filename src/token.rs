@@ -1,50 +1,50 @@
 pub enum Token {
-	if_tk,              // if
-	elif_tk,            // elif
-	else_tk,            // else
+	If,              // if
+	Elif,            // elif
+	Else,            // else
 
-	for_tk,             // for
-	in_tk,              // in
-	while_tk,           // while
+	For,             // for
+	In,              // in
+	While,           // while
 
-	return_tk,          // return
-	output_tk,          // ->
-	let_tk,             // let
-	assign_tk,          // =
+	Return,          // return
+	Output,          // ->
+	Let,             // let
+	Assign,          // =
 
-	struct_tk,          // struct
-	int_tk(i32),        // int
-	bool_tk(bool),      // bool
-	str_tk(String),     // str
-	var_tk(String),
-	comment_tk(String),	// #
+	Struct,          // struct
+	Int(i32),        // int
+	Bool(bool),      // bool
+	Str(String),     // str
+	Var(String),
+	Comment(String), // #
 
-	left_curly_tk,      // {
-	left_brace_tk,      // [
-	left_paren_tk,      // (
-	right_curly_tk,     // }
-	right_brace_tk,     // ]
-	right_paren_tk,     // )
+	LeftCurly,       // {
+	LeftBrace,       // [
+	LeftParen,       // (
+	RightCurly,      // }
+	RightBrace,      // ]
+	RightParen,      // )
 
-	dot_tk,             // .
-	comma_tk,           // ,
-	colon_tk,           // :
-	semicolon_tk,       // ;
+	Dot,             // .
+	Comma,           // ,
+	Colon,           // :
+	Semicolon,       // ;
 
-	minus_tk,           // -
-	plus_tk,            // +
-	divide_tk,          // /
-	multiply_tk,        // *
-	modulo_tk,          // %
+	Minus,           // -
+	Plus,            // +
+	Divide,          // /
+	Multiply,        // *
+	Modulo,          // %
 
-	and_tk,             // &&
-	or_tk,              // ||
-	not_tk,             // !
+	And,             // &&
+	Or,              // ||
+	Not,             // !
 
-	greater_than_tk,    // >
-	less_than_tk,       // <
-	greater_equal_tk,   // >=
-	less_equal_tk,      // <=
-	equal_tk,           // ==
-	not_equal_tk,       // !=
+	GreaterThan,     // >
+	LessThan,        // <
+	GreaterEqual,    // >=
+	LessEqual,       // <=
+	Equal,           // ==
+	NotEqual,        // !=
 }
