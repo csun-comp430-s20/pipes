@@ -1,50 +1,24 @@
-pub mod tokenizer {
-    pub enum token {
-        if_tk,              // if
-        elif_tk,            // elif
-        else_tk,            // else
+use crate::Tokens;
 
-        for_tk,             // for
-        in_tk,              // in
-        while_tk,           // while
+pub mod tokenizer
+{
+	pub fn tokenize(&str) -> Vec<Token> { }
 
-        return_tk,          // return
-        output_tk,          // ->
-        let_tk,             // let
-        assign_tk,          // =
+	// helpers
+	fn tokenize_int(&str) -> Option<Token.int_tk> { }
+	fn tokenize_bool(&str) -> Option<Token.bool_tk> { }
+	fn tokenize_str(&str) -> Option<Token.str_tk> { }
+	fn tokenize_var_or_keyword(&str) -> Option<Token> { }
+	
+	// takes some iterator and modifies it
+	// fn skip_whitespace(&mut iterator) { }
+}
 
-        struct_tk,          // struct
-        int_tk(i32),        // int
-        bool_tk(bool),      // bool
-        str_tk(String),     // str
-
-        left_curly_tk,      // {
-        left_brace_tk,      // [
-        left_paren_tk,      // (
-        right_curly_tk,     // }
-        right_brace_tk,     // ]
-        right_paren_tk,     // )
-
-        dot_tk,             // .
-        comma_tk,           // ,
-        colon_tk,           // :
-        semicolon_tk,       // ;
-
-        minus_tk,           // -
-        plus_tk,            // +
-        divide_tk,          // /
-        multiply_tk,        // *
-        modulo_tk,          // %
-
-        and_tk,             // &&
-        or_tk,              // ||
-        not_tk,             // !
-
-        greater_than_tk,    // >
-        less_than_tk,       // <
-        greater_equal_tk,   // >=
-        less_equal_tk,      // <=
-        equal_tk,           // ==
-        not_equal_tk,       // !=
-    }
+#[cfg(tests)]
+pub mod tests
+{
+	#[test]
+	fn dummy_test() {
+		assert_eq!(true, true)
+	}
 }
