@@ -52,9 +52,9 @@ pub mod tokenizer {
     }
 }
 
-#[cfg(tests)]
+#[cfg(test)]
 pub mod tests {
-    use self::tokenizer;
+    use crate::tokenizer;
 
     #[test]
     fn dummy_test() {
