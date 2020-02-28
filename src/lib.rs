@@ -23,20 +23,33 @@ pub mod tokenizer {
 
 
     fn tokenize_str(word: &str) -> Option<Token> {
-        //let mut input = word.iter();
-        let mut user_string = String::new();
-        if(word.chars().next().unwrap() == '\"'){
-            while let character = word.chars().next().unwrap(){
-                if character == '\"'{
-                    break;
-                } else{
-                    user_string.push(character);
-                }
+        let mut user_string = String::from("\"");
+        let mut bytes = word.as_bytes();
+        let mut start_byte= 0;
+        let mut end_byte = 0;
+        for (i, &item) in bytes.iter().enumerate(){
+            let charat = char::from(item);
+            if(charat == '\"'){
+                start_byte= i;
+                break;
             }
-            return Some(Token::Str(user_string.to_string()));
-        } else{
-            return None;
+            else{
+                return None;
+            }
         }
+        for (i, &item) in fullname[start_byte+1..].as_bytes().iter().enumerate(){
+            let charat = char::from(item);
+             if(charat == '\"'){
+                  println!("{}", i+start_byte+1);
+                  end_byte = i+start_byte+2;
+                  break;
+            }
+            else{
+                return None;
+            }
+        }
+        return Token::Str(&word[start_byte, end_byte]);
+
     }
 
 
