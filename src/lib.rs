@@ -33,33 +33,19 @@ pub mod tokenizer {
 
 	// takes the full input string
 	// returns a string token (or none) and the remainder
-    fn tokenize_str(word: &str) -> (Option<Token>, &str) {
-        let mut user_string = String::from("\"");
-        let mut bytes = word.as_bytes();
-        let mut start_byte= 0;
-        let mut end_byte = 0;
-        for (i, &item) in bytes.iter().enumerate(){
-            let charat = char::from(item);
-            if(charat == '\"'){
-                start_byte= i;
-                break;
-            }
-            else{
-                return None;
+    fn tokenize_str(input: &str) -> (Option<Token>, &str) {
+        let bytes = input.as_bytes();
+		if char::from(bytes[0]) != '\"' {
+			return (None, input);
+		}
+
+        for (i, &item) in bytes.iter().enumerate() {
+            let c = char::from(item);
+            if c.is_whitespace() {
+                return (Some(Token::Str(String::from(&input[..i]))), &input[i..]);
             }
         }
-        for (i, &item) in fullname[start_byte+1..].as_bytes().iter().enumerate(){
-            let charat = char::from(item);
-             if(charat == '\"'){
-                  println!("{}", i+start_byte+1);
-                  end_byte = i+start_byte+2;
-                  break;
-            }
-            else{
-                return None;
-            }
-        }
-        return Token::Str(&word[start_byte, end_byte]);
+        (None, &input[..])
     }
 
     fn tokenize_syntax(word: &str) -> Token {
@@ -137,7 +123,6 @@ pub mod tokenizer {
                 return (&s[..i], &s[i..]);
             }
         }
-
         ("", &s[..])
     }
 }
