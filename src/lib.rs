@@ -1,50 +1,63 @@
+mod token;
+
 pub mod tokenizer {
-    pub enum token {
-        if_tk,              // if
-        elif_tk,            // elif
-        else_tk,            // else
+    pub use crate::token::Token;
 
-        for_tk,             // for
-        in_tk,              // in
-        while_tk,           // while
+    pub fn tokenize(input: &str) -> Vec<Token> {
+        vec![]
+    }
 
-        return_tk,          // return
-        output_tk,          // ->
-        let_tk,             // let
-        assign_tk,          // =
+    // helpers
+    fn tokenize_int(word: &str) -> Option<Token> {
+        let test = word.parse::<i32>();
 
-        struct_tk,          // struct
-        int_tk(i32),        // int
-        bool_tk(bool),      // bool
-        str_tk(String),     // str
+	    match test {
+	        Ok(ok) => Some(Token::Int(ok)),
+	        Err(e) => None,
+        }
+    }
+    fn tokenize_bool(word: &str) -> Option<Token> {
+        None
+    }
+    fn tokenize_str(word: &str) -> Option<Token> {
+        None
+    }
+    fn tokenize_var_or_keyword(word: &str) -> Option<Token> {
+        match word {
+	        "if" => Some(Token::If),
+	        "elif" => Some(Token::Elif),
+	        "else" => Some(Token::Else),
+	        "for" => Some(Token::For),
+	        "in" => Some(Token::In),
+	        "while" => Some(Token::While),
+	        "return" => Some(Token::Return),
+	        "let" => Some(Token::Let),
+	        "struct" => Some(Token::Struct),
+	        _ => Some(Token::Var(word.to_string())),
+	    }
+    }
+    
+    //Takes a string slice and returns a slice without leading whitespace
+    fn skip_whitespace(s: &str) -> &str {
+        let bytes = s.as_bytes();
 
-        left_curly_tk,      // {
-        left_brace_tk,      // [
-        left_paren_tk,      // (
-        right_curly_tk,     // }
-        right_brace_tk,     // ]
-        right_paren_tk,     // )
+        for (i, &item) in bytes.iter().enumerate() {
+            let c = char::from(item);
+            if !c.is_whitespace() {
+                return &s[i..];
+            }
+        }
 
-        dot_tk,             // .
-        comma_tk,           // ,
-        colon_tk,           // :
-        semicolon_tk,       // ;
+        &s[..]
+    }
+}
 
-        minus_tk,           // -
-        plus_tk,            // +
-        divide_tk,          // /
-        multiply_tk,        // *
-        modulo_tk,          // %
+#[cfg(tests)]
+pub mod tests {
+    use self::tokenizer;
 
-        and_tk,             // &&
-        or_tk,              // ||
-        not_tk,             // !
-
-        greater_than_tk,    // >
-        less_than_tk,       // <
-        greater_equal_tk,   // >=
-        less_equal_tk,      // <=
-        equal_tk,           // ==
-        not_equal_tk,       // !=
+    #[test]
+    fn dummy_test() {
+        assert_eq!(true, true)
     }
 }
