@@ -21,8 +21,9 @@ pub mod tokenizer {
         }
     }
 
-
-    fn tokenize_str(word: &str) -> Option<Token> {
+	// takes the full input string
+	// returns a string token (or none) and the remainder
+    fn tokenize_str(word: &str) -> (Option<Token>, &str) {
         let mut user_string = String::from("\"");
         let mut bytes = word.as_bytes();
         let mut start_byte= 0;
