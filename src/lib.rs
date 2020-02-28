@@ -31,26 +31,29 @@ pub mod tokenizer {
         for (i, &item) in bytes.iter().enumerate(){
             let charat = char::from(item);
             if(charat == '\"'){
-                start_byte= i;
+                start_byte = i;
                 break;
             }
             else{
-                return None;
+                return (None, word);
             }
         }
-        for (i, &item) in fullname[start_byte+1..].as_bytes().iter().enumerate(){
-            let charat = char::from(item);
-             if(charat == '\"'){
-                  println!("{}", i+start_byte+1);
-                  end_byte = i+start_byte+2;
-                  break;
-            }
-            else{
-                return None;
+        if start_byte > 0{
+            for (i, &item) in word[start_byte+1..].as_bytes().iter().enumerate(){
+                let charat = char::from(item);
+                 if(charat == '\"'){
+                      println!("{}", i+start_byte+1);
+                      end_byte = i+start_byte+2;
+                      break;
+                }
+                else{
+                    return (None, word);
+                }
             }
         }
-        return Token::Str(&word[start_byte, end_byte]);
-
+        &word[end_byte+1..].to_string().to_owned();
+        return (Some(Token::Str((&word[start_byte..end_byte]).to_string())),
+                &word);
     }
 
 
