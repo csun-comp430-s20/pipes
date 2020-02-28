@@ -36,9 +36,20 @@ pub mod tokenizer {
 	        _ => Some(Token::Var(word.to_string())),
 	    }
     }
+    
+    //Takes a string slice and returns a slice without leading whitespace
+    fn skip_whitespace(s: &str) -> &str {
+        let bytes = s.as_bytes();
 
-    // takes some iterator and modifies it
-    fn skip_whitespace(iter: &mut str) {}
+        for (i, &item) in bytes.iter().enumerate() {
+            let c = char::from(item);
+            if !c.is_whitespace() {
+                return &s[i..];
+            }
+        }
+
+        &s[..]
+    }
 }
 
 #[cfg(tests)]
