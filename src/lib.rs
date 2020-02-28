@@ -4,14 +4,28 @@ pub mod tokenizer {
     pub use crate::token::Token;
 
     pub fn tokenize(input: &str) -> Vec<Token> {
-        vec![]
+		let tokens: Vec<Token> = vec![];
+		while input != "" {
+			input = skip_whitespace(input);
+			let (tk, input) = tokenize_str(input);
+			if let Some(tk) = tk {
+				tokens.push(tk);
+				continue;
+			}
+			let (word, input) = get_word(input);
+			if let Some(tk) = tokenize_int(word) {
+				tokens.push(tk);
+			}
+			else {
+				tokens.push(tokenize_syntax(word));
+			}
+		}
+		tokens
     }
 
     // helpers
     fn tokenize_int(word: &str) -> Option<Token> {
-        let test = word.parse::<i32>();
-
-	    match test {
+	    match word.parse::<i32>() {
 	        Ok(ok) => Some(Token::Int(ok)),
 	        Err(e) => None,
         }
