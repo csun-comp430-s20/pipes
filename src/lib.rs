@@ -1,5 +1,4 @@
 mod token;
-use std::iter::Peekable;
 
 pub mod tokenizer {
     pub use crate::token::Token;
@@ -12,6 +11,8 @@ pub mod tokenizer {
     fn tokenize_int(word: &str) -> Option<Token> {
         None
     }
+
+
     fn tokenize_bool(word: &str) -> Option<Token> {
         match word {
             "true" => Some(Token::Bool(true)),
@@ -22,7 +23,20 @@ pub mod tokenizer {
 
 
     fn tokenize_str(word: &str) -> Option<Token> {
-        None
+        //let mut input = word.iter();
+        let mut user_string = String::new();
+        if(word.chars().next().unwrap() == '\"'){
+            while let character = word.chars().next().unwrap(){
+                if character == '\"'{
+                    break;
+                } else{
+                    user_string.push(character);
+                }
+            }
+            return Some(Token::Str(user_string.to_string()));
+        } else{
+            return None;
+        }
     }
 
 
@@ -30,8 +44,9 @@ pub mod tokenizer {
         None
     }
 
+
     fn tokenize_syntax(word: &str) -> Option<Token>{
-        match work{
+        match word{
             "{" => Some(Token::LeftCurly),
             "}" => Some(Token::RightCurly),
             "(" => Some(Token::LeftParen),
@@ -46,7 +61,7 @@ pub mod tokenizer {
             "+" => Some(Token::Plus),
             "-" => Some(Token::Minus),
             "/" => Some(Token::Divide),
-            "*"" => Some(Token::Multiply),
+            "*" => Some(Token::Multiply),
             "%" => Some(Token::Modulo),
             "&&" => Some(Token::And),
             "||" => Some(Token::Or),
@@ -56,7 +71,7 @@ pub mod tokenizer {
             ">=" => Some(Token::GreaterEqual),
             "<=" => Some(Token::LessEqual),
             "==" => Some(Token::Equal),
-            "!=" => Some(Token::Or),
+            "\"!=\"" => Some(Token::Or),
              _ => None
         }
     }
@@ -65,7 +80,7 @@ pub mod tokenizer {
     fn skip_whitespace(iter: &mut str) {}
 }
 
-#[cfg(tests)]
+#[cfg(test)]
 pub mod tests {
     use self::tokenizer;
 
@@ -73,4 +88,5 @@ pub mod tests {
     fn dummy_test() {
         assert_eq!(true, true)
     }
+
 }
