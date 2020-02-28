@@ -9,15 +9,11 @@ pub mod tokenizer {
 
     // helpers
     fn tokenize_int(word: &str) -> Option<Token> {
-        None
-    }
+        let test = word.parse::<i32>();
 
-
-    fn tokenize_bool(word: &str) -> Option<Token> {
-        match word {
-            "true" => Some(Token::Bool(true)),
-            "false" => Some(Token::Bool(false)),
-            _ => None
+	    match test {
+	        Ok(ok) => Some(Token::Int(ok)),
+	        Err(e) => None,
         }
     }
 
@@ -50,53 +46,77 @@ pub mod tokenizer {
             }
         }
         return Token::Str(&word[start_byte, end_byte]);
-
     }
 
+    fn tokenize_syntax(word: &str) -> Token {
+        match word {
+			"if" => Token::If,
+			"elif" => Token::Elif,
+			"else" => Token::Else,
 
-    fn tokenize_var_or_keyword(word: &str) -> Option<Token> {
-        None
-    }
+			"for" => Token::For,
+			"in" => Token::In,
+			"while" => Token::While,
 
+			"return" => Token::Return,
+			"->" => Token::Output,
+			"let" => Token::Let,
+			"=" => Token::Assign,
 
-    fn tokenize_syntax(word: &str) -> Option<Token>{
-        match word{
-            "{" => Some(Token::LeftCurly),
-            "}" => Some(Token::RightCurly),
-            "(" => Some(Token::LeftParen),
-            ")" => Some(Token::RightParen),
-            "[" => Some(Token::LeftBrace),
-            "]" => Some(Token::RightBrace),
-            "." => Some(Token::Dot),
-            "," => Some(Token::Comma),
-            ";" => Some(Token::Semicolon),
-            ":" => Some(Token::Colon),
-            "," => Some(Token::Comma),
-            "+" => Some(Token::Plus),
-            "-" => Some(Token::Minus),
-            "/" => Some(Token::Divide),
-            "*" => Some(Token::Multiply),
-            "%" => Some(Token::Modulo),
-            "&&" => Some(Token::And),
-            "||" => Some(Token::Or),
-            "!" => Some(Token::Not),
-            ">" => Some(Token::GreaterThan),
-            "<" => Some(Token::LessThan),
-            ">=" => Some(Token::GreaterEqual),
-            "<=" => Some(Token::LessEqual),
-            "==" => Some(Token::Equal),
-            "\"!=\"" => Some(Token::Or),
-             _ => None
+			"struct" => Token::Struct,
+			"true" => Token::Bool(true),
+			"false" => Token::Bool(false),
+
+            "{" => Token::LeftCurly,
+            "[" => Token::LeftBrace,
+            "(" => Token::LeftParen,
+            "}" => Token::RightCurly,
+            "]" => Token::RightBrace,
+            ")" => Token::RightParen,
+
+            "." => Token::Dot,
+            "," => Token::Comma,
+            ":" => Token::Colon,
+            ";" => Token::Semicolon,
+
+            "-" => Token::Minus,
+            "+" => Token::Plus,
+            "/" => Token::Divide,
+            "*" => Token::Multiply,
+            "%" => Token::Modulo,
+
+            "&&" => Token::And,
+            "||" => Token::Or,
+            "!" => Token::Not,
+
+            ">" => Token::GreaterThan,
+            "<" => Token::LessThan,
+            ">=" => Token::GreaterEqual,
+            "<=" => Token::LessEqual,
+            "==" => Token::Equal,
+            "!=" => Token::NotEqual,
+
+             _ => Token::Var(String::from(word)),
         }
     }
 
-    // takes some iterator and modifies it
-    fn skip_whitespace(iter: &mut str) {}
+    //Takes a string slice and returns a slice without leading whitespace
+    fn skip_whitespace(s: &str) -> &str {
+        let bytes = s.as_bytes();
+
+        for (i, &item) in bytes.iter().enumerate() {
+            let c = char::from(item);
+            if !c.is_whitespace() {
+                return &s[i..];
+            }
+        }
+        &s[..]
+    }
 }
 
 #[cfg(test)]
 pub mod tests {
-    use self::tokenizer;
+    use crate::tokenizer;
 
     #[test]
     fn dummy_test() {
