@@ -103,7 +103,6 @@ pub mod tokenizer {
             ">=" => Some(Token::GreaterEqual),
             "<=" => Some(Token::LessEqual),
             "==" => Some(Token::Equal),
-            "\"!=\"" => Some(Token::Or),
              _ => None
         }
     }
