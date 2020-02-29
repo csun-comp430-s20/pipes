@@ -33,19 +33,37 @@ pub mod tokenizer {
 
 	// takes the full input string
 	// returns a string token (or none) and the remainder
-    fn tokenize_str(input: &str) -> (Option<Token>, &str) {
-        let bytes = input.as_bytes();
-		if char::from(bytes[0]) != '\"' {
-			return (None, input);
-		}
-
-        for (i, &item) in bytes.iter().enumerate() {
-            let c = char::from(item);
-            if c.is_whitespace() {
-                return (Some(Token::Str(String::from(&input[..i]))), &input[i..]);
+    fn tokenize_str(word: &str) -> (Option<Token>, &str) {
+        let mut user_string = String::from("\"");
+        let mut bytes = word.as_bytes();
+        let mut start_byte= 0;
+        let mut end_byte = 0;
+        for (i, &item) in bytes.iter().enumerate(){
+            let charat = char::from(item);
+            if(charat == '\"'){
+                start_byte = i;
+                break;
+            }
+            else{
+                return (None, word);
             }
         }
-        (None, &input[..])
+        if start_byte > 0{
+            for (i, &item) in word[start_byte+1..].as_bytes().iter().enumerate(){
+                let charat = char::from(item);
+                 if(charat == '\"'){
+                      println!("{}", i+start_byte+1);
+                      end_byte = i+start_byte+2;
+                      break;
+                }
+                else{
+                    return (None, word);
+                }
+            }
+        }
+        &word[end_byte+1..].to_string().to_owned();
+        return (Some(Token::Str((&word[start_byte..end_byte]).to_string())),
+                &word);
     }
 
     fn tokenize_syntax(word: &str) -> Token {
@@ -103,7 +121,6 @@ pub mod tokenizer {
     //Takes a string slice and returns a slice without leading whitespace
     fn skip_whitespace(s: &str) -> &str {
         let bytes = s.as_bytes();
-
         for (i, &item) in bytes.iter().enumerate() {
             let c = char::from(item);
             if !c.is_whitespace() {
@@ -131,7 +148,7 @@ pub mod tokenizer {
 pub mod tests {
     use crate::tokenizer::*;
 
-    #[test]
+	#[test]
 	fn get_one_word() {
 		assert_eq!(
 			get_word("Hello World"),
