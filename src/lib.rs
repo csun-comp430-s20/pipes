@@ -9,7 +9,12 @@ pub mod tokenizer {
 
     // helpers
     fn tokenize_int(word: &str) -> Option<Token> {
-        None
+        let test = word.parse::<i32>();
+
+	    match test {
+	        Ok(ok) => Some(Token::Int(ok)),
+	        Err(e) => None,
+        }
     }
 
 
@@ -58,9 +63,19 @@ pub mod tokenizer {
 
 
     fn tokenize_var_or_keyword(word: &str) -> Option<Token> {
-        None
+        match word {
+	        "if" => Some(Token::If),
+	        "elif" => Some(Token::Elif),
+	        "else" => Some(Token::Else),
+	        "for" => Some(Token::For),
+	        "in" => Some(Token::In),
+	        "while" => Some(Token::While),
+	        "return" => Some(Token::Return),
+	        "let" => Some(Token::Let),
+	        "struct" => Some(Token::Struct),
+	        _ => Some(Token::Var(word.to_string())),
+	    }
     }
-
 
     fn tokenize_syntax(word: &str) -> Option<Token>{
         match word{
@@ -93,13 +108,22 @@ pub mod tokenizer {
         }
     }
 
-    // takes some iterator and modifies it
-    fn skip_whitespace(iter: &mut str) {}
+    //Takes a string slice and returns a slice without leading whitespace
+    fn skip_whitespace(s: &str) -> &str {
+        let bytes = s.as_bytes();
+        for (i, &item) in bytes.iter().enumerate() {
+            let c = char::from(item);
+            if !c.is_whitespace() {
+                return &s[i..];
+            }
+        }
+        &s[..]
+    }
 }
 
 #[cfg(test)]
 pub mod tests {
-    use self::tokenizer;
+    use crate::tokenizer;
 
     #[test]
     fn dummy_test() {
