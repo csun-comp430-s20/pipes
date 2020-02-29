@@ -106,7 +106,7 @@ pub mod tokenizer {
              _ => None
         }
     }
-
+  
     //Takes a string slice and returns a slice without leading whitespace
     fn skip_whitespace(s: &str) -> &str {
         let bytes = s.as_bytes();
@@ -118,15 +118,56 @@ pub mod tokenizer {
         }
         &s[..]
     }
+
+	// Takes a string slice and returns a slice containing a word and the remainder
+    pub fn get_word(s: &str) -> (&str, &str) {
+        let bytes = s.as_bytes();
+
+        for (i, &item) in bytes.iter().enumerate() {
+            let c = char::from(item);
+            if c.is_whitespace() {
+                return (&s[..i], &s[i..]);
+            }
+        }
+
+        ("", &s[..])
+    }
 }
 
 #[cfg(test)]
 pub mod tests {
-    use crate::tokenizer;
+    use crate::tokenizer::*;
 
-    #[test]
-    fn dummy_test() {
-        assert_eq!(true, true)
-    }
+  #[test]
+	fn get_one_word() {
+		assert_eq!(
+			get_word("Hello World"),
+			("Hello", " World"));
+	}
 
-}
+	#[test]
+	fn get_no_word_1() {
+		assert_eq!(
+			get_word(""),
+			("", ""));
+	}
+
+	#[test]
+	fn get_no_word_2() {
+		assert_eq!(
+			get_word(" "),
+			("", " "));
+	}
+
+	#[test]
+	fn get_no_word_3() {
+		let s = " cant touch this";
+		for _ in 0..100 {
+			assert_eq!(get_word(s), ("", s));
+		}
+	}
+  
+  fn dummy_test() {
+      assert_eq!(true, true)
+      }
+  }
