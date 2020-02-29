@@ -4,15 +4,20 @@ pub mod tokenizer {
     pub use crate::token::Token;
 
     pub fn tokenize(input: &str) -> Vec<Token> {
-		let tokens: Vec<Token> = vec![];
+		let mut tokens: Vec<Token> = vec![];
+		let mut input = input;
+
 		while input != "" {
 			input = skip_whitespace(input);
-			let (tk, input) = tokenize_str(input);
+			let (tk, remainder) = tokenize_str(input);
+			input = remainder;
 			if let Some(tk) = tk {
 				tokens.push(tk);
 				continue;
 			}
-			let (word, input) = get_word(input);
+
+			let (word, remainder) = get_word(input);
+			input = remainder;
 			if let Some(tk) = tokenize_int(word) {
 				tokens.push(tk);
 			}
