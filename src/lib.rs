@@ -214,6 +214,66 @@ pub mod tests {
 	}
 
 	#[test]
+	fn tokenize_not_an_int() {
+		assert_eq!(
+			tokenize_int("let x = 5;"),
+			None)
+	}
+
+	#[test]
+	fn skip_whitespace_empty() {
+		assert_eq!(
+			skip_whitespace(""),
+			"")
+	}
+
+	#[test]
+	fn skip_whitespace_no_whitespace() {
+		assert_eq!(
+			skip_whitespace("HelloWorld"),
+			"HelloWorld")
+	}
+
+	#[test]
+	fn skip_whitespace_proper_sentence() {
+		assert_eq!(
+			skip_whitespace("The mitochondria is the powerhouse of the cell!"),
+			"The mitochondria is the powerhouse of the cell!")
+	}
+
+	#[test]
+	fn skip_whitespace_single_space() {
+		assert_eq!(
+			skip_whitespace(" word"),
+			"word")
+	}
+
+	#[test]
+	fn skip_whitespace_many_spaces() {
+		assert_eq!(
+			skip_whitespace("       word"),
+			"word")
+	}
+
+	#[test]
+	fn skip_whitespace_tabs() {
+		assert_eq!(
+			skip_whitespace("		word"),
+			"word")
+	}
+	
+	#[test]
+	fn skip_whitespace_newlines() {
+		assert_eq!(
+			skip_whitespace("
+
+
+
+							word"),
+			"word")
+	}
+	
+	#[test]
 	fn get_one_word() {
 		assert_eq!(
 			get_word("Hello World"),
