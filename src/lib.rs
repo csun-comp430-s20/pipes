@@ -183,6 +183,37 @@ pub mod tests {
 	}
 
 	#[test]
+	fn tokenize_str_empty() {
+		assert_eq!(
+			tokenize_str(""),
+			(None, ""))
+	}
+
+	#[test]
+	fn tokenize_not_a_string() {
+		assert_eq!(
+			tokenize_str("let x;"),
+			(None, "let x;"))
+	}
+
+	#[test]
+	fn tokenize_str_has_string_later() {
+		assert_eq!(
+			tokenize_str("let x = \"ab\";"),
+			(None, "let x = \"ab\";"))
+	}
+
+	#[test]
+	fn tokenize_lots_of_ints() {
+		for x in -500..500 {
+			let s = x.to_string();
+			assert_eq!(
+				tokenize_int(&s),
+				Some(Token::Int(x)))
+		}
+	}
+
+	#[test]
 	fn get_one_word() {
 		assert_eq!(
 			get_word("Hello World"),
