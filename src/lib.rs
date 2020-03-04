@@ -166,15 +166,14 @@ pub mod tests {
 	fn tokenize_int_assignment() {
 		assert_eq!(
 			tokenize("let x: int = 32;"),
-			vec!(Token::Let,
+			vec![Token::Let,
 				 Token::Var(String::from("x")),
 				 Token::Colon,
 				 Token::Assign,
 				 Token::Int(32),
 				 Token::Semicolon,
-			 ))
-	}
-	}
+			])
+		}
 
 	#[test]
 	fn tokenize_str_one_word() {
@@ -354,7 +353,7 @@ pub mod tests {
 	}
 
 	#[test]
-	fn neg_int_token_test() {
+	fn negative_int_token_test() {
 	    let receivedTokens: Vec<Token> = tokenize("-5");
 	    assert!(receivedTokens[0] == Token::Int(-5));
 	}
