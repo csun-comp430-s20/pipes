@@ -150,6 +150,7 @@ fn get_word(s: &str) -> (&str, &str) {
 	(&s[..], "")
 }
 
+
 #[cfg(test)]
 pub mod tests {
 	use crate::tokenizer::*;
@@ -363,4 +364,51 @@ pub mod tests {
 	    let receivedTokens: Vec<Token> = tokenize("false");
 	    assert!(receivedTokens[0] == Token::Bool(false));
 	}
+
+	#[test]
+	fn true_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("true");
+	    assert!(receivedTokens[0] == Token::Bool(true));
+	}
+
+
+	#[test]
+	fn greaterThan_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize(">");
+	    assert!(receivedTokens[0] == Token::GreaterThan);
+	}
+
+	#[test]
+	fn lessThan_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("<");
+	    assert!(receivedTokens[0] == Token::LessThan);
+	}
+
+	#[test]
+	fn greaterEqual_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize(">+");
+	    assert!(receivedTokens[0] == Token::GreaterEqual);
+	}
+
+	#[test]
+	fn lessEqual_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("<=");
+	    assert!(receivedTokens[0] == Token::GreaterThan);
+	}
+
+	#[test]
+	fn equal_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("==");
+	    assert!(receivedTokens[0] == Token::Equal);
+	}
+
+	#[test]
+	fn notEqual_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("!=");
+	    assert!(receivedTokens[0] == Token::NotEqual);
+	}
+
+
+
+
 }
