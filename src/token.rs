@@ -1,3 +1,4 @@
+#[derive(Debug, Eq, PartialEq)]
 pub enum Types {
 	Void,
 	Int,
@@ -11,6 +12,7 @@ pub enum Types {
 	List_Struct(String),
 }
 
+#[derive(Debug, Eq, PartialEq)]
 pub enum Token {
 	If,              // if
 	Elif,            // elif
