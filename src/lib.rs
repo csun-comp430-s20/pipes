@@ -1,9 +1,9 @@
 mod token;
-use crate::token::Token;
+use crate::token::*;
 
 pub mod tokenizer {
     use super::*;
-    pub use crate::token::Token;
+    pub use crate::token::*;
 
     pub fn tokenize(input: &str) -> Vec<Token> {
         let mut tokens: Vec<Token> = vec![];
@@ -18,7 +18,8 @@ pub mod tokenizer {
                     tokens.push(token);
                     input = remainder;
                 } else {
-                    panic!("No closing double-quote: {}", &input[..20])
+                    
+                    panic!("No closing double-quote: {}", input)
                 }
             } else if cursor.is_alphanumeric() {
                 let (candidate, remainder) = split_first_word(input);
@@ -30,14 +31,24 @@ pub mod tokenizer {
                     input = remainder;
                 }
             } else {
-                if let Some(token) = tokenize_symbol_pair(&input[..2]) {
-                    tokens.push(token);
-                    input = &input[2..];
-                } else if let Some(token) = tokenize_symbol(&input[..1]) {
-                    tokens.push(token);
-                    input = &input[1..];
-                } else {
-                    panic!("Failed to parse: {}", &input[..20]);
+                if input.len() >= 2 {
+                    if let Some(token) = tokenize_symbol_pair(&input[..2]) {
+                        tokens.push(token);
+                        input = &input[2..];
+                        continue;
+                    }
+                }
+
+                if input.len() >= 1 {
+                    if let Some(token) = tokenize_symbol(&input[..1]) {
+                        tokens.push(token);
+                        input = &input[1..];
+                        continue;
+                    }
+                }
+
+                if input != "" {
+                    panic!("Failed to parse: {}", input);
                 }
             }
         }
@@ -70,6 +81,8 @@ fn tokenize_word(word: &str) -> Token {
         "struct" => Token::Struct,
         "true" => Token::Bool(true),
         "false" => Token::Bool(false),
+
+        "int" => Token::TypeName(Type::Int),
 
         _ => Token::Var(String::from(word)),
     }
@@ -131,7 +144,7 @@ pub fn split_first_word(s: &str) -> (&str, &str) {
         }
     }
 
-    ("", &s[..])
+    (&s[..], "")
 }
 
 fn tokenize_symbol_pair(pair: &str) -> Option<Token> {
@@ -182,6 +195,7 @@ pub mod tests {
                 Token::Let,
                 Token::Var(String::from("x")),
                 Token::Colon,
+                Token::TypeName(Type::Int),
                 Token::Assign,
                 Token::Int(32),
                 Token::Semicolon,
@@ -345,7 +359,7 @@ pub mod tests {
     #[test]
     fn negative_int_token_test() {
         let received_tokens: Vec<Token> = tokenize("-5");
-        assert_eq!(received_tokens, vec!(Token::Int(-5)));
+        assert_eq!(received_tokens, vec!(Token::Minus, Token::Int(5)));
     }
 
     #[test]
