@@ -1,3 +1,16 @@
+pub enum Types {
+	Void,
+	Int,
+	Str,
+	Bool,
+	Struct(String),
+	HOF,
+	List_Int,
+	List_Str,
+	List_Bool,
+	List_Struct(String),
+}
+
 pub enum Token {
 	If,              // if
 	Elif,            // elif
@@ -12,7 +25,9 @@ pub enum Token {
 	Let,             // let
 	Assign,          // =
 
-	Struct,          // struct
+	Void,
+	Type(String),
+	Struct(String),  // struct
 	Int(i32),        // int
 	Bool(bool),      // bool
 	Str(String),     // str
