@@ -40,11 +40,14 @@ fn tokenize_int(word: &str) -> Option<Token> {
 
 // takes the full input string
 // returns a string token (or none) and the remainder
-fn tokenize_str(word: &str) -> (Option<Token>, &str) {
-	let mut user_string = String::from("\"");
-	let mut bytes = word.as_bytes();
+fn tokenize_str(word: &str) -> (Option<Token>, &str) {;
+	let bytes = word.as_bytes();
 	let mut start_byte= 0;
 	let mut end_byte = 0;
+    if  word == "" {
+        return (None, word);
+    }
+    else{
 	for (i, &item) in bytes.iter().enumerate(){
 		let charat = char::from(item);
 		if(charat == '\"'){
@@ -55,23 +58,26 @@ fn tokenize_str(word: &str) -> (Option<Token>, &str) {
 			return (None, word);
 		}
 	}
-	if start_byte > 0{
+	if start_byte >= 0{
 		for (i, &item) in word[start_byte+1..].as_bytes().iter().enumerate(){
 			let charat = char::from(item);
 			 if(charat == '\"'){
-				  println!("{}", i+start_byte+1);
 				  end_byte = i+start_byte+2;
 				  break;
 			}
-			else{
-				return (None, word);
-			}
 		}
 	}
-	&word[end_byte+1..].to_string().to_owned();
-	return (Some(Token::Str((&word[start_byte..end_byte]).to_string())),
-			&word);
+
+    let x = Some(Token::Str((&word[start_byte..end_byte]).to_string()));
+    if (word[start_byte..end_byte].to_string() == ""){
+        return (Some(Token::Str(word.to_string())), "");
+    }
+    else{
+	return (x, &word[end_byte..]);
+    }
 }
+}
+
 
 fn tokenize_syntax(word: &str) -> Token {
 	match word {
@@ -281,7 +287,7 @@ pub mod tests {
 			skip_whitespace("		word"),
 			"word")
 	}
-	
+
 	#[test]
 	fn skip_whitespace_newlines() {
 		assert_eq!(
@@ -292,7 +298,7 @@ pub mod tests {
 							word"),
 			"word")
 	}
-	
+
 	#[test]
 	fn get_one_word() {
 		assert_eq!(
@@ -321,7 +327,7 @@ pub mod tests {
 			assert_eq!(get_word(s), ("", s));
 		}
 	}
-	
+
 	#[test]
 	fn curly_token_test() {
 	    let receivedTokens: Vec<Token> = tokenize("{");
