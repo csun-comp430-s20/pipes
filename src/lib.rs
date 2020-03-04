@@ -152,7 +152,35 @@ fn get_word(s: &str) -> (&str, &str) {
 
 #[cfg(test)]
 pub mod tests {
+	use crate::tokenizer::*;
     use super::*;
+
+	#[test]
+	fn tokenize_str_one_word() {
+		let word = "\"Hello\"";
+		assert_eq!(
+			tokenize_str(word),
+			(Some(Token::Str(String::from(word))),
+			""))
+	}
+
+	#[test]
+	fn tokenize_str_two_words() {
+		let word = "\"Hello World\"";
+		assert_eq!(
+			tokenize_str(word),
+			(Some(Token::Str(String::from(word))),
+			""))
+	}
+
+	#[test]
+	fn tokenize_str_words_and_remainder() {
+		let input = "\"Hello World\"; let x = 5;";
+		assert_eq!(
+			tokenize_str(input),
+			(Some(Token::Str(String::from("\"Hello World\""))),
+			"; let x = 5;"))
+	}
 
 	#[test]
 	fn get_one_word() {
