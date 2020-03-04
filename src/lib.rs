@@ -325,159 +325,159 @@ pub mod tests {
 	
 	#[test]
 	fn curly_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("{");
-	    assert!(receivedTokens[0] == Token::LeftCurly);
+	    let received_tokens: Vec<Token> = tokenize("{");
+	    assert!(received_tokens[0] == Token::LeftCurly);
 	}
 
 	#[test]
 	fn if_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("if");
-	    assert!(receivedTokens[0] == Token::If);
+	    let received_tokens: Vec<Token> = tokenize("if");
+	    assert!(received_tokens[0] == Token::If);
 	}
 
 	#[test]
 	fn else_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("else");
-	    assert!(receivedTokens[0] == Token::Else);
+	    let received_tokens: Vec<Token> = tokenize("else");
+	    assert!(received_tokens[0] == Token::Else);
 	}
 
 	#[test]
 	fn else_if_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("else if");
-	    assert!(receivedTokens[0] == Token::Else && receivedTokens[1] == Token::If);
+	    let received_tokens: Vec<Token> = tokenize("else if");
+	    assert!(received_tokens[0] == Token::Else && received_tokens[1] == Token::If);
 	}
 
 	#[test]
 	fn int_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("12");
-	    assert!(receivedTokens[0] == Token::Int(12));
+	    let received_tokens: Vec<Token> = tokenize("12");
+	    assert!(received_tokens[0] == Token::Int(12));
 	}
 
 	#[test]
 	fn negative_int_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("-5");
-	    assert!(receivedTokens[0] == Token::Int(-5));
+	    let received_tokens: Vec<Token> = tokenize("-5");
+	    assert!(received_tokens[0] == Token::Int(-5));
 	}
 
 	#[test]
 	fn false_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("false");
-	    assert!(receivedTokens[0] == Token::Bool(false));
+	    let received_tokens: Vec<Token> = tokenize("false");
+	    assert!(received_tokens[0] == Token::Bool(false));
 	}
 
 	#[test]
 	fn true_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("true");
-	    assert!(receivedTokens[0] == Token::Bool(true));
+	    let received_tokens: Vec<Token> = tokenize("true");
+	    assert!(received_tokens[0] == Token::Bool(true));
 	}
 
 
 	#[test]
 	fn greater_than_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize(">");
-	    assert!(receivedTokens[0] == Token::GreaterThan);
+	    let received_tokens: Vec<Token> = tokenize(">");
+	    assert!(received_tokens[0] == Token::GreaterThan);
 	}
 
 	#[test]
 	fn less_than_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("<");
-	    assert!(receivedTokens[0] == Token::LessThan);
+	    let received_tokens: Vec<Token> = tokenize("<");
+	    assert!(received_tokens[0] == Token::LessThan);
 	}
 
 	#[test]
 	fn greater_equal_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize(">+");
-	    assert!(receivedTokens[0] == Token::GreaterEqual);
+	    let received_tokens: Vec<Token> = tokenize(">+");
+	    assert!(received_tokens[0] == Token::GreaterEqual);
 	}
 
 	#[test]
 	fn less_equal_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("<=");
-	    assert!(receivedTokens[0] == Token::GreaterThan);
+	    let received_tokens: Vec<Token> = tokenize("<=");
+	    assert!(received_tokens[0] == Token::GreaterThan);
 	}
 
 	#[test]
 	fn equal_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("==");
-	    assert!(receivedTokens[0] == Token::Equal);
+	    let received_tokens: Vec<Token> = tokenize("==");
+	    assert!(received_tokens[0] == Token::Equal);
 	}
 
 	#[test]
 	fn not_equal_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("!=");
-	    assert!(receivedTokens[0] == Token::NotEqual);
+	    let received_tokens: Vec<Token> = tokenize("!=");
+	    assert!(received_tokens[0] == Token::NotEqual);
 	}
 
 	#[test]
 	fn minus_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("-");
-	    assert!(receivedTokens[0] == Token::Minus);
+	    let received_tokens: Vec<Token> = tokenize("-");
+	    assert!(received_tokens[0] == Token::Minus);
 	}
 
 	#[test]
 	fn plus_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("+");
-	    assert!(receivedTokens[0] == Token::Plus);
+	    let received_tokens: Vec<Token> = tokenize("+");
+	    assert!(received_tokens[0] == Token::Plus);
 	}
 
 	#[test]
 	fn divide_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("/");
-	    assert!(receivedTokens[0] == Token::Divide);
+	    let received_tokens: Vec<Token> = tokenize("/");
+	    assert!(received_tokens[0] == Token::Divide);
 	}	
 
 	#[test]
 	fn multiply_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("*");
-	    assert!(receivedTokens[0] == Token::Multiply);
+	    let received_tokens: Vec<Token> = tokenize("*");
+	    assert!(received_tokens[0] == Token::Multiply);
 	}
 
 	#[test]
 	fn modulo_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("%");
-	    assert!(receivedTokens[0] == Token::Modulo);
+	    let received_tokens: Vec<Token> = tokenize("%");
+	    assert!(received_tokens[0] == Token::Modulo);
 	}
 
 	#[test]
 	fn and_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("&&");
-	    assert!(receivedTokens[0] == Token::And);
+	    let received_tokens: Vec<Token> = tokenize("&&");
+	    assert!(received_tokens[0] == Token::And);
 	}
 
 	#[test]
 	fn or_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("||");
-	    assert!(receivedTokens[0] == Token::Or);
+	    let received_tokens: Vec<Token> = tokenize("||");
+	    assert!(received_tokens[0] == Token::Or);
 	}
 
 	#[test]
 	fn not_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize("!");
-	    assert!(receivedTokens[0] == Token::Not);
+	    let received_tokens: Vec<Token> = tokenize("!");
+	    assert!(received_tokens[0] == Token::Not);
 	}
 
 	#[test]
 	fn dot_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize(".");
-	    assert!(receivedTokens[0] == Token::Dot);
+	    let received_tokens: Vec<Token> = tokenize(".");
+	    assert!(received_tokens[0] == Token::Dot);
 	}
 
 	#[test]
 	fn comma_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize(",");
-	    assert!(receivedTokens[0] == Token::Comma);
+	    let received_tokens: Vec<Token> = tokenize(",");
+	    assert!(received_tokens[0] == Token::Comma);
 	}
 
 	#[test]
 	fn colon_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize(":");
-	    assert!(receivedTokens[0] == Token::Not);
+	    let received_tokens: Vec<Token> = tokenize(":");
+	    assert!(received_tokens[0] == Token::Not);
 	}
 
 	#[test]
 	fn semi_colon_token_test() {
-	    let receivedTokens: Vec<Token> = tokenize(";");
-	    assert!(receivedTokens[0] == Token::Semicolon);
+	    let received_tokens: Vec<Token> = tokenize(";");
+	    assert!(received_tokens[0] == Token::Semicolon);
 	}
 
 }
