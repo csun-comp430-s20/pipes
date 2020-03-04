@@ -14,7 +14,7 @@ pub mod tokenizer {
             let cursor = char::from(input.as_bytes()[0]);
 
             if cursor == '\"' {
-                if let Some((token, remainder)) = tokenize_str(input) {
+                if let Some((token, remainder)) = tokenize_str(&input[1..]) {
                     tokens.push(token);
                     input = remainder;
                 } else {
@@ -104,8 +104,7 @@ fn tokenize_symbol(sym: &str) -> Option<Token> {
     }
 }
 
-// takes the full input string
-// returns a string token (or none) and the remainder
+// takes an input string and returns a string token (or none) and the remainder
 fn tokenize_str(s: &str) -> Option<(Token, &str)> {
     let bytes = s.as_bytes();
 
