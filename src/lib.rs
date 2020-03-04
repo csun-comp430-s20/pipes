@@ -1,7 +1,9 @@
 mod token;
+use crate::token::Token;
 
 pub mod tokenizer {
     pub use crate::token::Token;
+	use super::*;
 
     pub fn tokenize(input: &str) -> Vec<Token> {
 		let mut tokens: Vec<Token> = vec![];
@@ -27,131 +29,130 @@ pub mod tokenizer {
 		}
 		tokens
     }
+}
 
-    // helpers
-    fn tokenize_int(word: &str) -> Option<Token> {
-	    match word.parse::<i32>() {
-	        Ok(ok) => Some(Token::Int(ok)),
-	        Err(e) => None,
-        }
-    }
+fn tokenize_int(word: &str) -> Option<Token> {
+	match word.parse::<i32>() {
+		Ok(ok) => Some(Token::Int(ok)),
+		Err(_) => None,
+	}
+}
 
-	// takes the full input string
-	// returns a string token (or none) and the remainder
-    fn tokenize_str(word: &str) -> (Option<Token>, &str) {
-        let mut user_string = String::from("\"");
-        let mut bytes = word.as_bytes();
-        let mut start_byte= 0;
-        let mut end_byte = 0;
-        for (i, &item) in bytes.iter().enumerate(){
-            let charat = char::from(item);
-            if(charat == '\"'){
-                start_byte = i;
-                break;
-            }
-            else{
-                return (None, word);
-            }
-        }
-        if start_byte > 0{
-            for (i, &item) in word[start_byte+1..].as_bytes().iter().enumerate(){
-                let charat = char::from(item);
-                 if(charat == '\"'){
-                      println!("{}", i+start_byte+1);
-                      end_byte = i+start_byte+2;
-                      break;
-                }
-                else{
-                    return (None, word);
-                }
-            }
-        }
-        &word[end_byte+1..].to_string().to_owned();
-        return (Some(Token::Str((&word[start_byte..end_byte]).to_string())),
-                &word);
-    }
+// takes the full input string
+// returns a string token (or none) and the remainder
+fn tokenize_str(word: &str) -> (Option<Token>, &str) {
+	let mut user_string = String::from("\"");
+	let mut bytes = word.as_bytes();
+	let mut start_byte= 0;
+	let mut end_byte = 0;
+	for (i, &item) in bytes.iter().enumerate(){
+		let charat = char::from(item);
+		if(charat == '\"'){
+			start_byte = i;
+			break;
+		}
+		else{
+			return (None, word);
+		}
+	}
+	if start_byte > 0{
+		for (i, &item) in word[start_byte+1..].as_bytes().iter().enumerate(){
+			let charat = char::from(item);
+			 if(charat == '\"'){
+				  println!("{}", i+start_byte+1);
+				  end_byte = i+start_byte+2;
+				  break;
+			}
+			else{
+				return (None, word);
+			}
+		}
+	}
+	&word[end_byte+1..].to_string().to_owned();
+	return (Some(Token::Str((&word[start_byte..end_byte]).to_string())),
+			&word);
+}
 
-    fn tokenize_syntax(word: &str) -> Token {
-        match word {
-			"if" => Token::If,
-			"elif" => Token::Elif,
-			"else" => Token::Else,
+fn tokenize_syntax(word: &str) -> Token {
+	match word {
+		"if" => Token::If,
+		"elif" => Token::Elif,
+		"else" => Token::Else,
 
-			"for" => Token::For,
-			"in" => Token::In,
-			"while" => Token::While,
+		"for" => Token::For,
+		"in" => Token::In,
+		"while" => Token::While,
 
-			"return" => Token::Return,
-			"->" => Token::Output,
-			"let" => Token::Let,
-			"=" => Token::Assign,
+		"return" => Token::Return,
+		"->" => Token::Output,
+		"let" => Token::Let,
+		"=" => Token::Assign,
 
-			"struct" => Token::Struct,
-			"true" => Token::Bool(true),
-			"false" => Token::Bool(false),
+		"struct" => Token::Struct,
+		"true" => Token::Bool(true),
+		"false" => Token::Bool(false),
 
-            "{" => Token::LeftCurly,
-            "[" => Token::LeftBrace,
-            "(" => Token::LeftParen,
-            "}" => Token::RightCurly,
-            "]" => Token::RightBrace,
-            ")" => Token::RightParen,
+		"{" => Token::LeftCurly,
+		"[" => Token::LeftBrace,
+		"(" => Token::LeftParen,
+		"}" => Token::RightCurly,
+		"]" => Token::RightBrace,
+		")" => Token::RightParen,
 
-            "." => Token::Dot,
-            "," => Token::Comma,
-            ":" => Token::Colon,
-            ";" => Token::Semicolon,
+		"." => Token::Dot,
+		"," => Token::Comma,
+		":" => Token::Colon,
+		";" => Token::Semicolon,
 
-            "-" => Token::Minus,
-            "+" => Token::Plus,
-            "/" => Token::Divide,
-            "*" => Token::Multiply,
-            "%" => Token::Modulo,
+		"-" => Token::Minus,
+		"+" => Token::Plus,
+		"/" => Token::Divide,
+		"*" => Token::Multiply,
+		"%" => Token::Modulo,
 
-            "&&" => Token::And,
-            "||" => Token::Or,
-            "!" => Token::Not,
+		"&&" => Token::And,
+		"||" => Token::Or,
+		"!" => Token::Not,
 
-            ">" => Token::GreaterThan,
-            "<" => Token::LessThan,
-            ">=" => Token::GreaterEqual,
-            "<=" => Token::LessEqual,
-            "==" => Token::Equal,
-            "!=" => Token::NotEqual,
+		">" => Token::GreaterThan,
+		"<" => Token::LessThan,
+		">=" => Token::GreaterEqual,
+		"<=" => Token::LessEqual,
+		"==" => Token::Equal,
+		"!=" => Token::NotEqual,
 
-             _ => Token::Var(String::from(word)),
-        }
-    }
+		 _ => Token::Var(String::from(word)),
+	}
+}
 
-    //Takes a string slice and returns a slice without leading whitespace
-    fn skip_whitespace(s: &str) -> &str {
-        let bytes = s.as_bytes();
-        for (i, &item) in bytes.iter().enumerate() {
-            let c = char::from(item);
-            if !c.is_whitespace() {
-                return &s[i..];
-            }
-        }
-        &s[..]
-    }
+//Takes a string slice and returns a slice without leading whitespace
+fn skip_whitespace(s: &str) -> &str {
+	let bytes = s.as_bytes();
+	for (i, &item) in bytes.iter().enumerate() {
+		let c = char::from(item);
+		if !c.is_whitespace() {
+			return &s[i..];
+		}
+	}
+	&s[..]
+}
 
-	// Takes a string slice and returns a slice containing a word and the remainder
-    pub fn get_word(s: &str) -> (&str, &str) {
-        let bytes = s.as_bytes();
+// Takes a string slice and returns a slice containing a word and the remainder
+fn get_word(s: &str) -> (&str, &str) {
+	let bytes = s.as_bytes();
 
-        for (i, &item) in bytes.iter().enumerate() {
-            let c = char::from(item);
-            if c.is_whitespace() {
-                return (&s[..i], &s[i..]);
-            }
-        }
-        ("", &s[..])
-    }
+	for (i, &item) in bytes.iter().enumerate() {
+		let c = char::from(item);
+		if c.is_whitespace() {
+			return (&s[..i], &s[i..]);
+		}
+	}
+	("", &s[..])
 }
 
 #[cfg(test)]
 pub mod tests {
-    use crate::tokenizer::*;
+    use super::*;
 
 	#[test]
 	fn get_one_word() {
