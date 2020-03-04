@@ -191,28 +191,25 @@ pub mod tests {
 
     #[test]
     fn tokenize_str_one_word() {
-        let word = "\"Hello\"";
         assert_eq!(
-            tokenize_str(word),
-            Some((Token::Str(String::from(word)), ""))
+            tokenize_str("Hello\""),
+            Some((Token::Str(String::from("Hello")), ""))
         )
     }
 
     #[test]
     fn tokenize_str_two_words() {
-        let word = "\"Hello World\"";
         assert_eq!(
-            tokenize_str(word),
-            Some((Token::Str(String::from(word)), ""))
+            tokenize_str("Hello World\""),
+            Some((Token::Str(String::from("Hello World")), ""))
         )
     }
 
     #[test]
     fn tokenize_str_words_and_remainder() {
-        let input = "\"Hello World\"; let x = 5;";
         assert_eq!(
-            tokenize_str(input),
-            Some((Token::Str(String::from("\"Hello World\"")), "; let x = 5;"))
+            tokenize_str("Hello World\"; let x = 5;"),
+            Some((Token::Str(String::from("Hello World")), "; let x = 5;"))
         )
     }
 
