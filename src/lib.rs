@@ -156,6 +156,27 @@ pub mod tests {
     use super::*;
 
 	#[test]
+	fn tokenize_nothing() {
+		assert_eq!(
+			tokenize(""),
+			vec!())
+	}
+
+	#[test]
+	fn tokenize_int_assignment() {
+		assert_eq!(
+			tokenize("let x: int = 32;"),
+			vec!(Token::Let,
+				 Token::Var(String::from("x")),
+				 Token::Colon,
+				 Token::Assign,
+				 Token::Int(32),
+				 Token::Semicolon,
+			 ))
+	}
+	}
+
+	#[test]
 	fn tokenize_str_one_word() {
 		let word = "\"Hello\"";
 		assert_eq!(
