@@ -1,15 +1,15 @@
 #[derive(Debug, Eq, PartialEq)]
-pub enum Types {
+pub enum Type {
 	Void,
 	Int,
 	Str,
 	Bool,
 	Struct(String),
-	HOF,
-	List_Int,
-	List_Str,
-	List_Bool,
-	List_Struct(String),
+	HigherOrderFunction(Box<Type>, Box<Type>),
+	ListInt,
+	ListStr,
+	ListBool,
+	ListStruct(String),
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -27,9 +27,8 @@ pub enum Token {
 	Let,             // let
 	Assign,          // =
 
-	Void,
-	Type(String),
-	Struct(String),  // struct
+	TypeName(Type),
+	Struct,		     // struct
 	Int(i32),        // int
 	Bool(bool),      // bool
 	Str(String),     // str
@@ -65,3 +64,4 @@ pub enum Token {
 	Equal,           // ==
 	NotEqual,        // !=
 }
+
