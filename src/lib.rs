@@ -9,22 +9,34 @@ pub mod tokenizer {
 
         while input != "" {
             input = skip_whitespace(input);
+            let cursor = char::from(input.as_bytes()[0]);
 
-            let (tk, remainder) = tokenize_str(input);
+            if cursor == '\"' {
+                let (candidate, remainder) = tokenize_str(input);
 
-            if let Some(tk) = tk {
-                tokens.push(tk);
-                input = remainder;
-                continue;
-            }
-
-            let (word, remainder) = get_word(input);
-
-            if let Some(tk) = tokenize_int(word) {
-                tokens.push(tk);
-                input = remainder;
+                if let Some(token) = candidate {
+                    tokens.push(token);
+                    input = remainder;
+                }
+            } else if cursor.is_alphanumeric() {
+                let (candidate, remainder) = split_first_word(input);
+                    if let Some(token) = tokenize_int(candidate) {
+                        tokens.push(token);
+                        input = remainder;
+                    } else { 
+                        tokens.push(tokenize_word(candidate));
+                        input = remainder;
+                    }
             } else {
-                tokens.push(tokenize_syntax(word));
+                if let Some(token) = tokenize_symbol_pair(&input[..1]) {
+                    tokens.push(token);
+                    input = &input[2..];
+                } else if let Some(token) = tokenize_symbol(&input[..0]) {
+                    tokens.push(token);
+                    input = &input[1..];
+                } else {
+                    panic!("Failed to parse: {}", &input[..20]);
+                }
             }
         }
 
@@ -46,34 +58,11 @@ pub mod tokenizer {
         let bytes = word.as_bytes();
         let mut start_byte= 0;
         let mut end_byte = 0;
-        for (i, &item) in bytes.iter().enumerate(){
-            let charat = char::from(item);
-            if charat == '\"' {
-                start_byte = i;
-                break;
-            } else {
-                return (None, word);
-            }
-        }
-        if start_byte > 0{
-            for (i, &item) in word[start_byte+1..].as_bytes().iter().enumerate(){
-                let charat = char::from(item);
-                if charat == '\"' {
-                    println!("{}", i+start_byte+1);
-                    end_byte = i+start_byte+2;
-                    break;
-                }
-                else{
-                    return (None, word);
-                }
-            }
-        }
-        &word[end_byte+1..].to_string().to_owned();
 
         (Some(Token::Str((&word[start_byte..end_byte]).to_string())), &word)
     }
 
-    fn tokenize_syntax(word: &str) -> Token {
+    fn tokenize_word(word: &str) -> Token {
         match word {
             "if" => Token::If,
             "elif" => Token::Elif,
@@ -84,69 +73,88 @@ pub mod tokenizer {
             "while" => Token::While,
 
             "return" => Token::Return,
-            "->" => Token::Output,
             "let" => Token::Let,
-            "=" => Token::Assign,
 
             "struct" => Token::Struct,
             "true" => Token::Bool(true),
             "false" => Token::Bool(false),
 
-            "{" => Token::LeftCurly,
-            "[" => Token::LeftBrace,
-            "(" => Token::LeftParen,
-            "}" => Token::RightCurly,
-            "]" => Token::RightBrace,
-            ")" => Token::RightParen,
-
-            "." => Token::Dot,
-            "," => Token::Comma,
-            ":" => Token::Colon,
-            ";" => Token::Semicolon,
-
-            "-" => Token::Minus,
-            "+" => Token::Plus,
-            "/" => Token::Divide,
-            "*" => Token::Multiply,
-            "%" => Token::Modulo,
-
-            "&&" => Token::And,
-            "||" => Token::Or,
-            "!" => Token::Not,
-
-            ">" => Token::GreaterThan,
-            "<" => Token::LessThan,
-            ">=" => Token::GreaterEqual,
-            "<=" => Token::LessEqual,
-            "==" => Token::Equal,
-            "!=" => Token::NotEqual,
-
-            _ => Token::Var(String::from(word)),
+            _ => Token::Var(String::from(word))
         }
     }
+
+    fn tokenize_symbol(sym: &str) -> Option<Token> {
+        match sym {
+            "=" => Some(Token::Assign),
+            "{" => Some(Token::LeftCurly),
+            "[" => Some(Token::LeftBrace),
+            "(" => Some(Token::LeftParen),
+            "}" => Some(Token::RightCurly),
+            "]" => Some(Token::RightBrace),
+            ")" => Some(Token::RightParen),
+
+            "." => Some(Token::Dot),
+            "," => Some(Token::Comma),
+            ":" => Some(Token::Colon),
+            ";" => Some(Token::Semicolon),
+
+            "-" => Some(Token::Minus),
+            "+" => Some(Token::Plus),
+            "/" => Some(Token::Divide),
+            "*" => Some(Token::Multiply),
+            "%" => Some(Token::Modulo),
+            "!" => Some(Token::Not),
+
+            ">" => Some(Token::GreaterThan),
+            "<" => Some(Token::LessThan),
+
+            _ => None
+        }
+    }
+
+    fn tokenize_symbol_pair(pair: &str) -> Option<Token> {
+        match pair {
+            "->" => Some(Token::Output),
+            "&&" => Some(Token::And),
+            "||" => Some(Token::Or),
+
+            ">=" => Some(Token::GreaterEqual),
+            "<=" => Some(Token::LessEqual),
+            "==" => Some(Token::Equal),
+            "!=" => Some(Token::NotEqual),
+
+            _ => None
+        }
+    }
+
 
     //Takes a string slice and returns a slice without leading whitespace
     fn skip_whitespace(s: &str) -> &str {
         let bytes = s.as_bytes();
+
         for (i, &item) in bytes.iter().enumerate() {
             let c = char::from(item);
+
             if !c.is_whitespace() {
                 return &s[i..];
             }
         }
+
         &s[..]
     }
 
     // Takes a string slice and returns a slice containing a word and the remainder
-    pub fn get_word(s: &str) -> (&str, &str) {
+    pub fn split_first_word(s: &str) -> (&str, &str) {
         let bytes = s.as_bytes();
 
         for (i, &item) in bytes.iter().enumerate() {
             let c = char::from(item);
-            if c.is_whitespace() {
+
+            if !c.is_alphanumeric() && c != '_' {
                 return (&s[..i], &s[i..]);
             }
         }
+
         ("", &s[..])
     }
 }
@@ -158,21 +166,21 @@ pub mod tests {
     #[test]
     fn get_one_word() {
         assert_eq!(
-            get_word("Hello World"),
+            split_first_word("Hello World"),
             ("Hello", " World"));
     }
 
     #[test]
     fn get_no_word_1() {
         assert_eq!(
-            get_word(""),
+            split_first_word(""),
             ("", ""));
     }
 
     #[test]
     fn get_no_word_2() {
         assert_eq!(
-            get_word(" "),
+            split_first_word(" "),
             ("", " "));
     }
 
@@ -180,7 +188,7 @@ pub mod tests {
     fn get_no_word_3() {
         let s = " cant touch this";
         for _ in 0..100 {
-            assert_eq!(get_word(s), ("", s));
+            assert_eq!(split_first_word(s), ("", s));
         }
     }
 }
