@@ -147,7 +147,7 @@ fn get_word(s: &str) -> (&str, &str) {
 			return (&s[..i], &s[i..]);
 		}
 	}
-	("", &s[..])
+	(&s[..], "")
 }
 
 #[cfg(test)]
@@ -300,5 +300,47 @@ pub mod tests {
 		for _ in 0..100 {
 			assert_eq!(get_word(s), ("", s));
 		}
+	}
+	
+	#[test]
+	fn curly_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("{");
+	    assert!(receivedTokens[0] == Token::LeftCurly);
+	}
+
+	#[test]
+	fn if_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("if");
+	    assert!(receivedTokens[0] == Token::If);
+	}
+
+	#[test]
+	fn else_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("else");
+	    assert!(receivedTokens[0] == Token::Else);
+	}
+
+	#[test]
+	fn else_if_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("else if");
+	    assert!(receivedTokens[0] == Token::Else && receivedTokens[1] == Token::If);
+	}
+
+	#[test]
+	fn int_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("12");
+	    assert!(receivedTokens[0] == Token::Int(12));
+	}
+
+	#[test]
+	fn neg_int_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("-5");
+	    assert!(receivedTokens[0] == Token::Int(-5));
+	}
+
+	#[test]
+	fn false_token_test() {
+	    let receivedTokens: Vec<Token> = tokenize("false");
+	    assert!(receivedTokens[0] == Token::Bool(false));
 	}
 }
