@@ -498,6 +498,13 @@ pub mod tests {
 	}
 
 	#[test]
+	fn tokenize_weird_int() {
+		assert_eq!(
+			tokenize("1_000_000"),
+			vec![Token::Int(1000000)])
+	}
+
+	#[test]
 	fn tokenize_weird_var_name_1() {
 		assert_eq!(
 			tokenize("ifelse"),
@@ -514,15 +521,36 @@ pub mod tests {
 	#[test]
 	fn tokenize_weird_var_name_3() {
 		assert_eq!(
-			tokenize("under_score"),
-			vec![Token::Var(String::from("under_score"))])
+			tokenize("_"),
+			vec![Token::Var(String::from("_"))])
 	}
 
 	#[test]
 	fn tokenize_weird_var_name_4() {
 		assert_eq!(
+			tokenize("under_score"),
+			vec![Token::Var(String::from("under_score"))])
+	}
+
+	#[test]
+	fn tokenize_weird_var_name_5() {
+		assert_eq!(
 			tokenize("_underscore"),
 			vec![Token::Var(String::from("_underscore"))])
+	}
+
+	#[test]
+	fn tokenize_weird_var_name_6() {
+		assert_eq!(
+			tokenize("underscore_"),
+			vec![Token::Var(String::from("underscore_"))])
+	}
+
+	#[test]
+	fn tokenize_weird_var_name_7() {
+		assert_eq!(
+			tokenize("num1"),
+			vec![Token::Var(String::from("num1"))])
 	}
 
 	// probably need to change tokenize stub, needs to return an error?
@@ -536,15 +564,144 @@ pub mod tests {
 	#[test]
 	fn tokenize_illegal_var_name_2() {
 		assert_eq!(
-			tokenize("?"),
+			tokenize("|||"),
 			vec![])
 	}
 
 	#[test]
 	fn tokenize_illegal_var_name_3() {
 		assert_eq!(
+			tokenize("?"),
+			vec![])
+	}
+
+	#[test]
+	fn tokenize_illegal_var_name_4() {
+		assert_eq!(
+			tokenize("1num"),
+			vec![])
+	}
+
+	#[test]
+	fn tokenize_illegal_var_name_5() {
+		assert_eq!(
 			tokenize("123_this_is_a_var"),
 			vec![])
+	}
+
+	// ----------- basic input tests ---------- \\
+	#[test]
+	fn tokenize_1_plus_2_no_whitespace() {
+		assert_eq!(
+			tokenize("1+2"),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_single_space() {
+		assert_eq!(
+			tokenize("1 + 2"),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_single_space_front() {
+		assert_eq!(
+			tokenize(" 1+2"),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_single_tab_front() {
+		assert_eq!(
+			tokenize("	1+2"),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_single_newline_front() {
+		assert_eq!(
+			tokenize("
+					 1+2"),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_single_space_back() {
+		assert_eq!(
+			tokenize("1+2 "),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_single_tab_back() {
+		assert_eq!(
+			tokenize("1+2	"),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_single_newline_back() {
+		assert_eq!(
+			tokenize("1+2
+					 "),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_single_space_wrapped() {
+		assert_eq!(
+			tokenize(" 1 + 2 "),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
+	}
+
+	#[test]
+	fn tokenize_1_plus_2_too_much_whitespace() {
+		assert_eq!(
+			tokenize("	1
+					 +						
+					 2						 "),
+			vec![
+				Token::Int(1),
+				Token::Plus,
+				Token::Int(2),
+			])
 	}
 
 	// ----------- complex input tests ---------- \\
@@ -695,14 +852,16 @@ pub mod tests {
 	#[test]
 	fn tokenize_higher_order_func_assignment() {
 		assert_eq!(
-			tokenize("let x: int -> int = (a) { return 1 + a; };"),
+			tokenize("let x: (int -> int) = (a) { return 1 + a; };"),
 			 vec![
 				 Token::Let,
 				 Token::Var(String::from("x")),
 				 Token::Colon,
+				 Token::LeftParen,
 				 Token::TypeName(Type::Int),
 				 Token::Output,
 				 Token::TypeName(Type::Int),
+				 Token::RightParen,
 				 Token::Assign,
 				 Token::LeftParen,
 				 Token::Var(String::from("a")),
