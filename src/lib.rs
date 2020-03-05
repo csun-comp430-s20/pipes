@@ -497,6 +497,27 @@ pub mod tests {
 			vec![Token::NotEqual])
 	}
 
+	#[test]
+	fn tokenize_weird_var_name_1() {
+		assert_eq!(
+			tokenize("ifelse"),
+			vec![Token::Var(String::from("ifelse"))])
+	}
+
+	#[test]
+	fn tokenize_weird_var_name_2() {
+		assert_eq!(
+			tokenize("under_score"),
+			vec![Token::Var(String::from("under_score"))])
+	}
+
+	#[test]
+	fn tokenize_weird_var_name_3() {
+		assert_eq!(
+			tokenize("_underscore"),
+			vec![Token::Var(String::from("_underscore"))])
+	}
+
 	// ----------- complex input tests ---------- \\
     #[test]
     fn tokenize_int_assignment() {
@@ -514,11 +535,218 @@ pub mod tests {
         )
     }
 
-    //re-write as test for tokenize()
-    //#[test]
-    //fn tokenize_str_has_string_later() {
-    //assert_eq!(tokenize_str("let x = \"ab\";"), (None, "let x = \"ab\";"))
-    //}
+    #[test]
+    fn tokenize_assignment_min_whitespace() {
+        assert_eq!(
+            tokenize("let x:int=32;"),
+            vec![
+                Token::Let,
+                Token::Var(String::from("x")),
+                Token::Colon,
+                Token::TypeName(Type::Int),
+                Token::Assign,
+                Token::Int(32),
+                Token::Semicolon,
+            ]
+        )
+    }
+
+    #[test]
+    fn tokenize_assignment_no_whitespace() {
+        assert_eq!(
+            tokenize("letx:int=32;"),
+            vec![
+                Token::Var(String::from("letx")),
+                Token::Colon,
+                Token::TypeName(Type::Int),
+                Token::Assign,
+                Token::Int(32),
+                Token::Semicolon,
+            ])
+    }
+	
+    #[test]
+    fn tokenize_str_assignment() {
+		assert_eq!(
+			tokenize("let x: str = \"Hello World!\";"),
+			vec![
+				Token::Let,
+				Token::Var(String::from("x")),
+				Token::Colon,
+				Token::TypeName(Type::Str),
+				Token::Assign,
+				Token::Str(String::from("Hello World")),
+				Token::Semicolon,
+			])
+    }
+
+    #[test]
+    fn tokenize_bool_assignment() {
+		assert_eq!(
+			tokenize("let x: bool = true;"),
+			vec![
+				Token::Let,
+				Token::Var(String::from("x")),
+				Token::Colon,
+				Token::TypeName(Type::Bool),
+				Token::Assign,
+				Token::Bool(true),
+				Token::Semicolon,
+			])
+    }
+
+    #[test]
+    fn tokenize_void_assignment() {
+		assert_eq!(
+			tokenize("let x: void = ();"),
+			vec![
+				Token::Let,
+				Token::Var(String::from("x")),
+				Token::Colon,
+				Token::TypeName(Type::Void),
+				Token::Assign,
+				Token::LeftParen,
+				Token::RightParen,
+				Token::Semicolon,
+			])
+    }
+
+    #[test]
+    fn tokenize_struct_assignment() {
+		assert_eq!(
+			tokenize("let x: foo = {
+					bar: 32,
+					baz: \"Hello World\",
+				};"),
+			vec![
+				Token::Let,
+				Token::Var(String::from("x")),
+				Token::Colon,
+				Token::TypeName(Type::Struct(String::from("foo"))),
+				Token::Assign,
+				Token::LeftCurly,
+				Token::Var(String::from("bar")),
+				Token::Colon,
+				Token::Int(32),
+				Token::Comma,
+				Token::Var(String::from("baz")),
+				Token::Colon,
+				Token::Str(String::from("Hello World")),
+				Token::Comma,
+				Token::RightCurly,
+				Token::Semicolon,
+			])
+    }
+
+	#[test]
+	fn tokenize_list_assignment() {
+		assert_eq!(
+			tokenize("let x: [int] = [32, 17, -5,];"),
+			vec![
+				Token::Let,
+				Token::Var(String::from("x")),
+				Token::Colon,
+				Token::LeftBrace,
+				Token::TypeName(Type::Int),
+				Token::RightBrace,
+				Token::Assign,
+				Token::LeftBrace,
+				Token::Int(32),
+				Token::Comma,
+				Token::Int(17),
+				Token::Comma,
+				Token::Minus,
+				Token::Int(5),
+				Token::Comma,
+				Token::RightBrace,
+				Token::Semicolon,
+			])
+	}
+
+	#[test]
+	fn tokenize_higher_order_func_assignment() {
+		assert_eq!(
+			tokenize("let x: int -> int = (a) { return 1 + a; };"),
+			 vec![
+				 Token::Let,
+				 Token::Var(String::from("x")),
+				 Token::Colon,
+				 Token::TypeName(Type::Int),
+				 Token::Output,
+				 Token::TypeName(Type::Int),
+				 Token::Assign,
+				 Token::LeftParen,
+				 Token::Var(String::from("a")),
+				 Token::RightParen,
+				 Token::LeftCurly,
+				 Token::Return,
+				 Token::Int(1),
+				 Token::Plus,
+				 Token::Var(String::from("a")),
+				 Token::Semicolon,
+				 Token::RightCurly,
+				 Token::Semicolon,
+			 ])
+	}
+
+	#[test]
+	fn tokenize_function_declaration() {
+		assert_eq!(
+			tokenize("func bad_adder(a: int, b: int,) -> int {
+					let x: int = a;
+					let y: int = b;
+					let result: int = a + b;
+					return result;
+				}"),
+			vec![
+				Token::Function,
+				Token::Var(String::from("bad_adder")),
+
+				Token::LeftParen,
+				Token::Var(String::from("a")),
+				Token::Colon,
+				Token::TypeName(Type::Int),
+				Token::Comma,
+
+				Token::Var(String::from("b")),
+				Token::Colon,
+				Token::TypeName(Type::Int),
+				Token::Comma,
+				Token::RightParen,
+
+				Token::Output,
+				Token::TypeName(Type::Int),
+				Token::LeftCurly,
+
+				Token::Let,
+				Token::Var(String::from("x")),
+				Token::TypeName(Type::Int),
+				Token::Assign,
+				Token::Var(String::from("a")),
+				Token::Semicolon,
+
+				Token::Let,
+				Token::Var(String::from("y")),
+				Token::TypeName(Type::Int),
+				Token::Assign,
+				Token::Var(String::from("b")),
+				Token::Semicolon,
+
+				Token::Let,
+				Token::Var(String::from("result")),
+				Token::TypeName(Type::Int),
+				Token::Assign,
+				Token::Var(String::from("a")),
+				Token::Plus,
+				Token::Var(String::from("b")),
+				Token::Semicolon,
+
+				Token::Return,
+				Token::Var(String::from("result")),
+				Token::Semicolon,
+				Token::RightCurly,
+			])
+	}
 
 	// ----------- tokenize_str() tests ---------- \\
     #[test]
