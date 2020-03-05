@@ -18,7 +18,6 @@ pub mod tokenizer {
                     tokens.push(token);
                     input = remainder;
                 } else {
-                    
                     panic!("No closing double-quote: {}", input)
                 }
             } else if cursor.is_alphanumeric() {
@@ -57,7 +56,6 @@ pub mod tokenizer {
     }
 }
 
-// helpers
 fn tokenize_int(word: &str) -> Option<Token> {
     match word.parse::<i32>() {
         Ok(ok) => Some(Token::Int(ok)),
@@ -182,11 +180,324 @@ pub mod tests {
     use super::*;
     use crate::tokenizer::*;
 
+	// ----------- tokenize() tests ---------- \\
+	// ----------- simple input tests ---------- \\
     #[test]
     fn tokenize_nothing() {
-        assert_eq!(tokenize(""), vec!())
+        assert_eq!(tokenize(""), vec![])
     }
 
+    #[test]
+    fn tokenize_keyword_if() {
+        assert_eq!(
+			tokenize("if"),
+			vec![Token::If])
+    }
+
+    #[test]
+    fn tokenize_keyword_elif() {
+        assert_eq!(
+			tokenize("elif"),
+			vec![Token::Elif])
+    }
+
+    #[test]
+    fn tokenize_keyword_else() {
+        assert_eq!(
+			tokenize("else"),
+			vec![Token::Else])
+    }
+
+    #[test]
+    fn tokenize_keyword_for() {
+        assert_eq!(
+			tokenize("for"),
+			vec![Token::For])
+    }
+
+    #[test]
+    fn tokenize_keyword_in() {
+        assert_eq!(
+			tokenize("in"),
+			vec![Token::In])
+    }
+
+    #[test]
+    fn tokenize_keyword_while() {
+        assert_eq!(
+			tokenize("while"),
+			vec![Token::While])
+    }
+
+    #[test]
+    fn tokenize_keyword_return() {
+        assert_eq!(
+			tokenize("return"),
+			vec![Token::Return])
+    }
+
+    #[test]
+    fn tokenize_keyword_output() {
+        assert_eq!(
+			tokenize("->"),
+			vec![Token::Output])
+    }
+
+    #[test]
+    fn tokenize_keyword_let() {
+        assert_eq!(
+			tokenize("let"),
+			vec![Token::Let])
+    }
+
+    #[test]
+    fn tokenize_keyword_assign() {
+        assert_eq!(
+			tokenize("="),
+			vec![Token::Assign])
+    }
+
+    #[test]
+    fn tokenize_keyword_type_void() {
+        assert_eq!(
+			tokenize("void"),
+			vec![Token::TypeName(Type::Void)])
+    }
+
+    #[test]
+    fn tokenize_keyword_type_int() {
+        assert_eq!(
+			tokenize("int"),
+			vec![Token::TypeName(Type::Int)])
+    }
+
+    #[test]
+    fn tokenize_keyword_type_str() {
+        assert_eq!(
+			tokenize("str"),
+			vec![Token::TypeName(Type::Str)])
+    }
+
+    #[test]
+    fn tokenize_keyword_type_bool() {
+        assert_eq!(
+			tokenize("bool"),
+			vec![Token::TypeName(Type::Bool)])
+    }
+
+    #[test]
+    fn tokenize_keyword_type_struct() {
+		// not sure about this one
+        assert_eq!(
+			tokenize("struct foo"),
+			vec![Token::TypeName(Type::Struct(String::from("foo")))])
+    }
+
+    #[test]
+    fn tokenize_keyword_struct() {
+        assert_eq!(
+			tokenize("struct"),
+			vec![Token::Struct])
+    }
+
+	#[test]
+	fn tokenize_keyword_int() {
+		assert_eq!(
+			tokenize("5"),
+			vec![Token::Int(5)])
+	}
+
+	#[test]
+	fn tokenize_keyword_negative_int() {
+		// the parser will firgure out that it's a negative int
+		assert_eq!(
+			tokenize("-5"),
+			vec![Token::Minus, Token::Int(5)])
+	}
+
+	#[test]
+	fn tokenize_keyword_true() {
+		assert_eq!(
+			tokenize("true"),
+			vec![Token::Bool(true)])
+	}
+
+	#[test]
+	fn tokenize_keyword_false() {
+		assert_eq!(
+			tokenize("false"),
+			vec![Token::Bool(false)])
+	}
+
+    #[test]
+    fn tokenize_keyword_left_curly() {
+        assert_eq!(
+			tokenize("{"),
+			vec![Token::LeftCurly])
+    }
+
+    #[test]
+    fn tokenize_keyword_right_curly() {
+        assert_eq!(
+			tokenize("}"),
+			vec![Token::RightCurly])
+    }
+
+    #[test]
+    fn tokenize_keyword_left_brace() {
+        assert_eq!(
+			tokenize("["),
+			vec![Token::LeftBrace])
+    }
+
+    #[test]
+    fn tokenize_keyword_right_brace() {
+        assert_eq!(
+			tokenize("]"),
+			vec![Token::RightBrace])
+    }
+
+    #[test]
+    fn tokenize_keyword_left_paren() {
+        assert_eq!(
+			tokenize("("),
+			vec![Token::LeftParen])
+    }
+
+    #[test]
+    fn tokenize_keyword_right_paren() {
+        assert_eq!(
+			tokenize(")"),
+			vec![Token::RightParen])
+    }
+
+    #[test]
+    fn tokenize_keyword_dot() {
+        assert_eq!(
+			tokenize("."),
+			vec![Token::Dot])
+    }
+
+    #[test]
+    fn tokenize_keyword_comma() {
+        assert_eq!(
+			tokenize(","),
+			vec![Token::Comma])
+    }
+
+    #[test]
+    fn tokenize_keyword_colon() {
+        assert_eq!(
+			tokenize(":"),
+			vec![Token::Colon])
+    }
+
+    #[test]
+    fn tokenize_keyword_semicolon() {
+        assert_eq!(
+			tokenize(";"),
+			vec![Token::Semicolon])
+    }
+
+	#[test]
+	fn tokenize_keyword_minus() {
+		assert_eq!(
+			tokenize("-"),
+			vec![Token::Minus])
+	}
+
+	#[test]
+	fn tokenize_keyword_plus() {
+		assert_eq!(
+			tokenize("+"),
+			vec![Token::Plus])
+	}
+
+	#[test]
+	fn tokenize_keyword_divide() {
+		assert_eq!(
+			tokenize("/"),
+			vec![Token::Divide])
+	}
+
+	#[test]
+	fn tokenize_keyword_multiply() {
+		assert_eq!(
+			tokenize("*"),
+			vec![Token::Multiply])
+	}
+
+	#[test]
+	fn tokenize_keyword_modulo() {
+		assert_eq!(
+			tokenize("%"),
+			vec![Token::Modulo])
+	}
+
+	#[test]
+	fn tokenize_keyword_and() {
+		assert_eq!(
+			tokenize("&&"),
+			vec![Token::And])
+	}
+
+	#[test]
+	fn tokenize_keyword_or() {
+		assert_eq!(
+			tokenize("||"),
+			vec![Token::Or])
+	}
+
+	#[test]
+	fn tokenize_keyword_not() {
+		assert_eq!(
+			tokenize("!"),
+			vec![Token::Not])
+	}
+
+	#[test]
+	fn tokenize_keyword_greater_than() {
+		assert_eq!(
+			tokenize(">"),
+			vec![Token::GreaterThan])
+	}
+
+	#[test]
+	fn tokenize_keyword_less_than() {
+		assert_eq!(
+			tokenize("<"),
+			vec![Token::LessThan])
+	}
+
+	#[test]
+	fn tokenize_keyword_greater_equal() {
+		assert_eq!(
+			tokenize(">="),
+			vec![Token::GreaterEqual])
+	}
+
+	#[test]
+	fn tokenize_keyword_less_equal() {
+		assert_eq!(
+			tokenize("<="),
+			vec![Token::LessEqual])
+	}
+
+	#[test]
+	fn tokenize_keyword_equal() {
+		assert_eq!(
+			tokenize("=="),
+			vec![Token::Equal])
+	}
+
+	#[test]
+	fn tokenize_keyword_not_equal() {
+		assert_eq!(
+			tokenize("!="),
+			vec![Token::NotEqual])
+	}
+
+	// ----------- complex input tests ---------- \\
     #[test]
     fn tokenize_int_assignment() {
         assert_eq!(
@@ -203,6 +514,13 @@ pub mod tests {
         )
     }
 
+    //re-write as test for tokenize()
+    //#[test]
+    //fn tokenize_str_has_string_later() {
+    //assert_eq!(tokenize_str("let x = \"ab\";"), (None, "let x = \"ab\";"))
+    //}
+
+	// ----------- tokenize_str() tests ---------- \\
     #[test]
     fn tokenize_str_one_word() {
         assert_eq!(
@@ -237,12 +555,7 @@ pub mod tests {
         assert_eq!(tokenize_str("let x;"), None)
     }
 
-    //re-write as test for tokenize()
-    //#[test]
-    //fn tokenize_str_has_string_later() {
-    //assert_eq!(tokenize_str("let x = \"ab\";"), (None, "let x = \"ab\";"))
-    //}
-
+	// ----------- tokenize_int() tests ---------- \\
     #[test]
     fn tokenize_lots_of_ints() {
         for x in -500..500 {
@@ -256,6 +569,7 @@ pub mod tests {
         assert_eq!(tokenize_int("let x = 5;"), None)
     }
 
+	// ----------- skip_whitespace() tests ---------- \\
     #[test]
     fn skip_whitespace_empty() {
         assert_eq!(skip_whitespace(""), "")
@@ -303,6 +617,7 @@ pub mod tests {
         )
     }
 
+	// ----------- split_first_word() tests ---------- \\
     #[test]
     fn get_one_word() {
         assert_eq!(split_first_word("Hello World"), ("Hello", " World"));
@@ -324,47 +639,5 @@ pub mod tests {
         for _ in 0..100 {
             assert_eq!(split_first_word(s), ("", s));
         }
-    }
-
-    #[test]
-    fn curly_token_test() {
-        let received_tokens: Vec<Token> = tokenize("{");
-        assert_eq!(received_tokens, vec![Token::LeftCurly]);
-    }
-
-    #[test]
-    fn if_token_test() {
-        let received_tokens: Vec<Token> = tokenize("if");
-        assert_eq!(received_tokens, vec!(Token::If));
-    }
-
-    #[test]
-    fn else_token_test() {
-        let received_tokens: Vec<Token> = tokenize("else");
-        assert_eq!(received_tokens, vec!(Token::Else));
-    }
-
-    #[test]
-    fn else_if_token_test() {
-        let received_tokens: Vec<Token> = tokenize("else if");
-        assert_eq!(received_tokens, vec!(Token::Else, Token::If));
-    }
-
-    #[test]
-    fn int_token_test() {
-        let received_tokens: Vec<Token> = tokenize("12");
-        assert_eq!(received_tokens, vec!(Token::Int(12)));
-    }
-
-    #[test]
-    fn negative_int_token_test() {
-        let received_tokens: Vec<Token> = tokenize("-5");
-        assert_eq!(received_tokens, vec!(Token::Minus, Token::Int(5)));
-    }
-
-    #[test]
-    fn false_token_test() {
-        let received_tokens: Vec<Token> = tokenize("false");
-        assert_eq!(received_tokens, vec!(Token::Bool(false)));
     }
 }
