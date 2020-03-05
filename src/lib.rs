@@ -507,15 +507,44 @@ pub mod tests {
 	#[test]
 	fn tokenize_weird_var_name_2() {
 		assert_eq!(
-			tokenize("under_score"),
-			vec![Token::Var(String::from("under_score"))])
+			tokenize("If"),
+			vec![Token::Var(String::from("If"))])
 	}
 
 	#[test]
 	fn tokenize_weird_var_name_3() {
 		assert_eq!(
+			tokenize("under_score"),
+			vec![Token::Var(String::from("under_score"))])
+	}
+
+	#[test]
+	fn tokenize_weird_var_name_4() {
+		assert_eq!(
 			tokenize("_underscore"),
 			vec![Token::Var(String::from("_underscore"))])
+	}
+
+	// probably need to change tokenize stub, needs to return an error?
+	#[test]
+	fn tokenize_illegal_var_name_1() {
+		assert_eq!(
+			tokenize("&"),
+			vec![])
+	}
+
+	#[test]
+	fn tokenize_illegal_var_name_2() {
+		assert_eq!(
+			tokenize("?"),
+			vec![])
+	}
+
+	#[test]
+	fn tokenize_illegal_var_name_3() {
+		assert_eq!(
+			tokenize("123_this_is_a_var"),
+			vec![])
 	}
 
 	// ----------- complex input tests ---------- \\
