@@ -704,11 +704,27 @@ pub mod tests {
 			])
 	}
 
-	// ----------- complex input tests ---------- \\
+	// ----------- typical input tests ---------- \\
     #[test]
     fn tokenize_int_assignment() {
         assert_eq!(
             tokenize("let x: int = 32;"),
+            vec![
+                Token::Let,
+                Token::Var(String::from("x")),
+                Token::Colon,
+                Token::TypeName(Type::Int),
+                Token::Assign,
+                Token::Int(32),
+                Token::Semicolon,
+            ]
+        )
+    }
+
+    #[test]
+    fn tokenize_assignment_whitespace_termination() {
+        assert_eq!(
+            tokenize("let x:int=32; "),
             vec![
                 Token::Let,
                 Token::Var(String::from("x")),
@@ -878,6 +894,34 @@ pub mod tests {
 	}
 
 	#[test]
+	fn tokenize_struct_definition() {
+		assert_eq!(
+			tokenize("struct Foo {
+						bar: int,
+						baz: str,
+						qux: bool,
+					}"),
+			vec![
+				Token::Struct,
+				Token::Var(String::from("Foo")),
+				Token::LeftCurly,
+				Token::Var(String::from("bar")),
+				Token::Colon,
+				Token::TypeName(Type::Int),
+				Token::Comma,
+				Token::Var(String::from("baz")),
+				Token::Colon,
+				Token::TypeName(Type::Str),
+				Token::Comma,
+				Token::Var(String::from("qux")),
+				Token::Colon,
+				Token::TypeName(Type::Bool),
+				Token::Comma,
+				Token::RightCurly,
+			])
+	}
+
+	#[test]
 	fn tokenize_function_definition() {
 		assert_eq!(
 			tokenize("func bad_adder(a: int, b: int,) -> int {
@@ -933,6 +977,21 @@ pub mod tests {
 				Token::Var(String::from("result")),
 				Token::Semicolon,
 				Token::RightCurly,
+			])
+	}
+
+	#[test]
+	fn tokenize_function_call() {
+		assert_eq!(
+			tokenize("foo(x, y);"),
+			vec![
+				Token::Var(String::from("foo")),
+				Token::LeftParen,
+				Token::Var(String::from("x")),
+				Token::Comma,
+				Token::Var(String::from("y")),
+				Token::RightParen,
+				Token::Semicolon,
 			])
 	}
 
