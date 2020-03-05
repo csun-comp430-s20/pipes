@@ -719,7 +719,7 @@ pub mod tests {
 	}
 
 	#[test]
-	fn tokenize_function_declaration() {
+	fn tokenize_function_definition() {
 		assert_eq!(
 			tokenize("func bad_adder(a: int, b: int,) -> int {
 					let x: int = a;
