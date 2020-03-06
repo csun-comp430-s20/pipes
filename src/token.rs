@@ -29,6 +29,7 @@ pub enum Token {
 
     TypeName(Type),
     Struct,      // struct
+    Function,    // func
     Int(i32),    // int
     Bool(bool),  // bool
     Str(String), // str
