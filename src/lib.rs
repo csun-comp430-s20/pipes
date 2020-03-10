@@ -73,6 +73,7 @@ fn tokenize_word(word: &str) -> Token {
         "in" => Token::In,
         "while" => Token::While,
 
+		"func" => Token::Function,
         "return" => Token::Return,
         "let" => Token::Let,
 
@@ -81,6 +82,9 @@ fn tokenize_word(word: &str) -> Token {
         "false" => Token::Bool(false),
 
         "int" => Token::TypeName(Type::Int),
+        "str" => Token::TypeName(Type::Str),
+        "bool" => Token::TypeName(Type::Bool),
+        "void" => Token::TypeName(Type::Void),
 
         _ => Token::Var(String::from(word)),
     }
@@ -218,13 +222,18 @@ pub mod tests {
     }
 
     #[test]
-    fn tokenize_keyword_return() {
-        assert_eq!(tokenize("return"), vec![Token::Return])
+    fn tokenize_keyword_function() {
+        assert_eq!(tokenize("func"), vec![Token::Function])
     }
 
     #[test]
     fn tokenize_keyword_output() {
         assert_eq!(tokenize("->"), vec![Token::Output])
+    }
+
+    #[test]
+    fn tokenize_keyword_return() {
+        assert_eq!(tokenize("return"), vec![Token::Return])
     }
 
     #[test]
@@ -262,7 +271,7 @@ pub mod tests {
         // not sure about this one
         assert_eq!(
             tokenize("struct foo"),
-            vec![Token::TypeName(Type::Struct(String::from("foo")))]
+            vec![Token::Struct, Token::Var(String::from("foo"))]
         )
     }
 
@@ -652,7 +661,7 @@ pub mod tests {
                 Token::Colon,
                 Token::TypeName(Type::Str),
                 Token::Assign,
-                Token::Str(String::from("Hello World")),
+                Token::Str(String::from("Hello World!")),
                 Token::Semicolon,
             ]
         )
@@ -704,7 +713,7 @@ pub mod tests {
                 Token::Let,
                 Token::Var(String::from("x")),
                 Token::Colon,
-                Token::TypeName(Type::Struct(String::from("foo"))),
+                Token::Var(String::from("foo")),
                 Token::Assign,
                 Token::LeftCurly,
                 Token::Var(String::from("bar")),
@@ -836,18 +845,21 @@ pub mod tests {
                 Token::LeftCurly,
                 Token::Let,
                 Token::Var(String::from("x")),
+				Token::Colon,
                 Token::TypeName(Type::Int),
                 Token::Assign,
                 Token::Var(String::from("a")),
                 Token::Semicolon,
                 Token::Let,
                 Token::Var(String::from("y")),
+				Token::Colon,
                 Token::TypeName(Type::Int),
                 Token::Assign,
                 Token::Var(String::from("b")),
                 Token::Semicolon,
                 Token::Let,
                 Token::Var(String::from("result")),
+				Token::Colon,
                 Token::TypeName(Type::Int),
                 Token::Assign,
                 Token::Var(String::from("a")),
