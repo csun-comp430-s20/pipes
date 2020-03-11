@@ -11,6 +11,7 @@ pub mod tokenizer {
 
         while input != "" {
             input = skip_whitespace(input);
+			if input == "" { return tokens; }
             let cursor = char::from(input.as_bytes()[0]);
 
             if cursor == '\"' {
@@ -20,7 +21,7 @@ pub mod tokenizer {
                 } else {
                     panic!("No closing double-quote: {}", input)
                 }
-            } else if cursor.is_alphanumeric() {
+            } else if cursor.is_alphanumeric() || cursor == '_' {
                 let (candidate, remainder) = split_first_word(input);
                 if let Some(token) = tokenize_int(candidate) {
                     tokens.push(token);
@@ -31,7 +32,7 @@ pub mod tokenizer {
                 }
             } else {
                 if input.len() >= 2 {
-                    if let Some(token) = tokenize_symbol_pair(&input[..2]) {
+                    if let Some(token) = tokenize_symbol(&input[..2]) {
                         tokens.push(token);
                         input = &input[2..];
                         continue;
@@ -57,6 +58,7 @@ pub mod tokenizer {
 }
 
 fn tokenize_int(word: &str) -> Option<Token> {
+	let word = word.replace("_", "");
     match word.parse::<i32>() {
         Ok(ok) => Some(Token::Int(ok)),
         Err(_) => None,
@@ -115,6 +117,15 @@ fn tokenize_symbol(sym: &str) -> Option<Token> {
         ">" => Some(Token::GreaterThan),
         "<" => Some(Token::LessThan),
 
+        "->" => Some(Token::Output),
+        "&&" => Some(Token::And),
+        "||" => Some(Token::Or),
+
+        ">=" => Some(Token::GreaterEqual),
+        "<=" => Some(Token::LessEqual),
+        "==" => Some(Token::Equal),
+        "!=" => Some(Token::NotEqual),
+
         _ => None,
     }
 }
@@ -130,12 +141,11 @@ fn tokenize_str(s: &str) -> Option<(Token, &str)> {
             return Some((Token::Str(String::from(&s[..i])), &s[i + 1..]));
         }
     }
-
     None
 }
 
 // Takes a string slice and returns a slice containing a word and the remainder
-pub fn split_first_word(s: &str) -> (&str, &str) {
+fn split_first_word(s: &str) -> (&str, &str) {
     let bytes = s.as_bytes();
 
     for (i, &item) in bytes.iter().enumerate() {
@@ -149,34 +159,14 @@ pub fn split_first_word(s: &str) -> (&str, &str) {
     (&s[..], "")
 }
 
-fn tokenize_symbol_pair(pair: &str) -> Option<Token> {
-    match pair {
-        "->" => Some(Token::Output),
-        "&&" => Some(Token::And),
-        "||" => Some(Token::Or),
-
-        ">=" => Some(Token::GreaterEqual),
-        "<=" => Some(Token::LessEqual),
-        "==" => Some(Token::Equal),
-        "!=" => Some(Token::NotEqual),
-
-        _ => None,
-    }
-}
-
 //takes a string slice and returns a slice without leading whitespace
 fn skip_whitespace(s: &str) -> &str {
-    let bytes = s.as_bytes();
-
-    for (i, &item) in bytes.iter().enumerate() {
-        let c = char::from(item);
-
-        if !c.is_whitespace() {
+    for (i, &item) in s.as_bytes().iter().enumerate() {
+        if !char::from(item).is_whitespace() {
             return &s[i..];
         }
     }
-
-    &s[..]
+    ""
 }
 
 #[cfg(test)]
@@ -470,30 +460,32 @@ pub mod tests {
         assert_eq!(tokenize("num1"), vec![Token::Var(String::from("num1"))])
     }
 
-    // probably need to change tokenize stub, needs to return an error?
     #[test]
+    fn tokenize_weird_var_name_8() {
+        assert_eq!(tokenize("1num"), vec![Token::Var(String::from("1num"))])
+    }
+
+    #[test]
+    fn tokenize_weird_var_name_9() {
+        assert_eq!(tokenize("123_this_is_a_var"), vec![Token::Var(String::from("123_this_is_a_var"))])
+    }
+
+    #[test]
+	#[should_panic]
     fn tokenize_illegal_var_name_1() {
         assert_eq!(tokenize("&"), vec![])
     }
 
     #[test]
+	#[should_panic]
     fn tokenize_illegal_var_name_2() {
         assert_eq!(tokenize("|||"), vec![])
     }
 
     #[test]
+	#[should_panic]
     fn tokenize_illegal_var_name_3() {
         assert_eq!(tokenize("?"), vec![])
-    }
-
-    #[test]
-    fn tokenize_illegal_var_name_4() {
-        assert_eq!(tokenize("1num"), vec![])
-    }
-
-    #[test]
-    fn tokenize_illegal_var_name_5() {
-        assert_eq!(tokenize("123_this_is_a_var"), vec![])
     }
 
     // ----------- basic input tests ---------- \\
