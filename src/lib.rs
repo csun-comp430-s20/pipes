@@ -580,7 +580,7 @@ pub mod tests {
         assert_eq!(
             tokenize(
                 "	1
-					 +						
+					 +
 					 2						 "
             ),
             vec![Token::Int(1), Token::Plus, Token::Int(2),]
@@ -1010,4 +1010,67 @@ pub mod tests {
             assert_eq!(split_first_word(s), ("", s));
         }
     }
+
+
+
+
+    // ----------------- tokenize while tests ------------------ \\
+    #[test]
+    fn tokenize_while_with_condition(){
+        assert_eq!(tokenize("while (x != 5){
+        return true; }"),
+        vec![
+        Token::While,
+        Token::LeftParen,
+        Token::Var(String::from("x")),
+        Token::NotEqual,
+        Token::Int(5),
+        Token::RightParen,
+        Token::LeftCurly,
+        Token::Return,
+        Token::Bool(true),
+        Token::Semicolon,
+        Token::RightCurly,]);
+
+        }
+
+    // ----------------- tokenize for loop tests ------------------ \\
+    #[test]
+    fn tokenize_for_loop(){
+        assert_eq!(tokenize("for items in list return items"),
+        vec![
+        Token::For,
+        Token::Var(String::from("items")),
+        Token::In,
+        Token::Var(String::from("list")),
+        Token::Return,
+        Token::Var(String::from("items")),]);
+    }
+
+    // ----------------- tokenize if else tests ------------------ \\
+    #[test]
+    fn tokenize_if_else(){
+        assert_eq!(tokenize("if(x = 1){
+                             y = true;
+                         } else y = false;"),
+        vec![
+        Token::If,
+        Token::LeftParen,
+        Token::Var(String::from("x")),
+        Token::Assign,
+        Token::Int(1),
+        Token::RightParen,
+        Token::LeftCurly,
+        Token::Var(String::from("y")),
+        Token::Assign,
+        Token::Bool(true),
+        Token::Semicolon,
+        Token::RightCurly,
+        Token::Else,
+        Token::Var(String::from("y")),
+        Token::Assign,
+        Token::Bool(false),
+        Token::Semicolon]);
+    }
+
 }
