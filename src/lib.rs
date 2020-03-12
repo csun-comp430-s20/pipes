@@ -21,7 +21,8 @@ pub mod tokenizer {
 			}
 
 			if chunk.symbols.is_empty() {
-				()		// make sure to do nothing on empty
+				// make sure to do nothing on empty
+				()
 			} else if let Some(tk) = tokenize_symbol(&chunk.symbols) {
 				tokens.push(tk);
 			} else if let (Some(tk1), Some(tk2)) = (
@@ -29,6 +30,19 @@ pub mod tokenizer {
 					tokenize_symbol(&chunk.symbols[1..])) {
 				tokens.push(tk1);
 				tokens.push(tk2);
+			} else if let (Some(tk), "\"") = (
+					tokenize_symbol(&chunk.symbols[..1]),
+					&chunk.symbols[1..]) {
+				tokens.push(tk);
+				let (tk, rem) = tokenize_str(chunk.remainder);
+				input = rem;
+				tokens.push(tk);
+			} else if let ("\"", s) = (&chunk.symbols[..1], &chunk.symbols[1..]) {
+				if let (Token::Str(mut tk), rem) = tokenize_str(chunk.remainder) {
+					input = rem;
+					tk.insert_str(0, s);
+					tokens.push(Token::Str(tk));
+				}
 			} else if chunk.symbols == "\"" {
 				let (tk, rem) = tokenize_str(chunk.remainder);
 				input = rem;
@@ -82,7 +96,7 @@ fn make_chunk(input: &str) -> Option<OrderedChunk> {
 
 fn tokenize_int(word: &str) -> Option<Token> {
     match word.replace("_", "").parse::<i32>() {
-        Ok(ok) => Some(Token::Int(ok)),
+        Ok(int) => Some(Token::Int(int)),
         Err(_) => None,
     }
 }
@@ -90,9 +104,7 @@ fn tokenize_int(word: &str) -> Option<Token> {
 // assumes that a starting double quote was already found
 fn tokenize_str(input: &str) -> (Token, &str) {
     for (i, &item) in input.as_bytes().iter().enumerate() {
-        let c = char::from(item);
-
-        if c == '\"' {
+        if char::from(item) == '\"' {
             return (Token::Str(String::from(&input[..i])), &input[i + 1..]);
         }
     }
@@ -575,6 +587,32 @@ pub mod tests {
             vec![Token::Int(1), Token::Plus, Token::Int(2),]
         )
     }
+
+	#[test]
+	fn tokenize_symbol_as_string_1() {
+		assert_eq!(tokenize("\"(\""), vec![Token::Str(String::from("("))])
+	}
+
+	#[test]
+	fn tokenize_symbol_as_string_2() {
+		assert_eq!(tokenize("\"()\""), vec![Token::Str(String::from("()"))])
+	}
+
+	#[test]
+	fn tokenize_symbol_as_string_3() {
+		assert_eq!(tokenize("(\"\""), vec![Token::LeftParen, Token::Str(String::from(""))])
+	}
+
+	#[test]
+	fn tokenize_symbol_as_string_4() {
+		assert_eq!(
+			tokenize("(\"\")"),
+			vec![
+				Token::LeftParen,
+				Token::Str(String::from("")),
+				Token::RightParen,
+			])
+	}
 
     // ----------- typical input tests ---------- \\
     #[test]
