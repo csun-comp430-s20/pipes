@@ -9,52 +9,36 @@ pub mod tokenizer {
         let mut tokens: Vec<Token> = vec![];
         let mut input = input;
 
-        while input != "" {
-            input = skip_whitespace(input);
-			if input == "" { return tokens; }
-            let cursor = char::from(input.as_bytes()[0]);
+		while let Some(chunk) = make_chunk(input) {
+			input = chunk.remainder;
+			if let Some(tk) = tokenize_int(chunk.alphanumerics) {
+				tokens.push(tk);
+			} else if let Some(tk) = tokenize_word(chunk.alphanumerics) {
+				tokens.push(tk);
+			}
+			else if !chunk.alphanumerics.is_empty() {
+				panic!("Failed to tokenize '{}' as alphanumeric", chunk.alphanumerics);
+			}
 
-            if cursor == '\"' {
-                if let Some((token, remainder)) = tokenize_str(&input[1..]) {
-                    tokens.push(token);
-                    input = remainder;
-                } else {
-                    panic!("No closing double-quote: {}", input)
-                }
-            } else if cursor.is_alphanumeric() || cursor == '_' {
-                let (candidate, remainder) = split_first_word(input);
-                if let Some(token) = tokenize_int(candidate) {
-                    tokens.push(token);
-                    input = remainder;
-                } else {
-                    tokens.push(tokenize_word(candidate));
-                    input = remainder;
-                }
-            } else {
-                if input.len() >= 2 {
-                    if let Some(token) = tokenize_symbol(&input[..2]) {
-                        tokens.push(token);
-                        input = &input[2..];
-                        continue;
-                    }
-                }
-
-                if input.len() >= 1 {
-                    if let Some(token) = tokenize_symbol(&input[..1]) {
-                        tokens.push(token);
-                        input = &input[1..];
-                        continue;
-                    }
-                }
-
-                if input != "" {
-                    panic!("Failed to parse: {}", input);
-                }
-            }
-        }
-
-        tokens
-    }
+			if chunk.symbols.is_empty() {
+				()		// make sure to do nothing on empty
+			} else if let Some(tk) = tokenize_symbol(&chunk.symbols) {
+				tokens.push(tk);
+			} else if let (Some(tk1), Some(tk2)) = (
+					tokenize_symbol(&chunk.symbols[..1]),
+					tokenize_symbol(&chunk.symbols[1..])) {
+				tokens.push(tk1);
+				tokens.push(tk2);
+			} else if chunk.symbols == "\"" {
+				let (tk, rem) = tokenize_str(chunk.remainder);
+				input = rem;
+				tokens.push(tk);
+			} else {
+				panic!("Failed to tokenize '{}' as symbol", chunk.symbols);
+			}
+		}
+		tokens
+	}
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -82,7 +66,7 @@ fn make_chunk(input: &str) -> Option<OrderedChunk> {
 	}
 
 	let mut sym = anum;
-	while sym < bytes.len()
+	while sym < bytes.len() && sym < anum + 2
 		&& !(char::from(bytes[sym]).is_alphanumeric()
 		|| char::from(bytes[sym]) == '_'
 		|| char::from(bytes[sym]).is_whitespace()) {
@@ -97,37 +81,49 @@ fn make_chunk(input: &str) -> Option<OrderedChunk> {
 }
 
 fn tokenize_int(word: &str) -> Option<Token> {
-	let word = word.replace("_", "");
-    match word.parse::<i32>() {
+    match word.replace("_", "").parse::<i32>() {
         Ok(ok) => Some(Token::Int(ok)),
         Err(_) => None,
     }
 }
 
-fn tokenize_word(word: &str) -> Token {
+// assumes that a starting double quote was already found
+fn tokenize_str(input: &str) -> (Token, &str) {
+    for (i, &item) in input.as_bytes().iter().enumerate() {
+        let c = char::from(item);
+
+        if c == '\"' {
+            return (Token::Str(String::from(&input[..i])), &input[i + 1..]);
+        }
+    }
+	panic!("Failed to tokenize {} as a string, no closing double quote", input)
+}
+
+fn tokenize_word(word: &str) -> Option<Token> {
     match word {
-        "if" => Token::If,
-        "elif" => Token::Elif,
-        "else" => Token::Else,
+        "if" => Some(Token::If),
+        "elif" => Some(Token::Elif),
+        "else" => Some(Token::Else),
 
-        "for" => Token::For,
-        "in" => Token::In,
-        "while" => Token::While,
+        "for" => Some(Token::For),
+        "in" => Some(Token::In),
+        "while" => Some(Token::While),
 
-		"func" => Token::Function,
-        "return" => Token::Return,
-        "let" => Token::Let,
+		"func" => Some(Token::Function),
+        "return" => Some(Token::Return),
+        "let" => Some(Token::Let),
 
-        "struct" => Token::Struct,
-        "true" => Token::Bool(true),
-        "false" => Token::Bool(false),
+        "struct" => Some(Token::Struct),
+        "true" => Some(Token::Bool(true)),
+        "false" => Some(Token::Bool(false)),
 
-        "int" => Token::TypeName(Type::Int),
-        "str" => Token::TypeName(Type::Str),
-        "bool" => Token::TypeName(Type::Bool),
-        "void" => Token::TypeName(Type::Void),
+        "int" => Some(Token::TypeName(Type::Int)),
+        "str" => Some(Token::TypeName(Type::Str)),
+        "bool" => Some(Token::TypeName(Type::Bool)),
+        "void" => Some(Token::TypeName(Type::Void)),
 
-        _ => Token::Var(String::from(word)),
+		"" => None,
+        _ => Some(Token::Var(String::from(word))),
     }
 }
 
@@ -165,47 +161,9 @@ fn tokenize_symbol(sym: &str) -> Option<Token> {
         "==" => Some(Token::Equal),
         "!=" => Some(Token::NotEqual),
 
+		"\"\"" => Some(Token::Str(String::new())),
         _ => None,
     }
-}
-
-// takes an input string and returns a string token (or none) and the remainder
-fn tokenize_str(s: &str) -> Option<(Token, &str)> {
-    let bytes = s.as_bytes();
-
-    for (i, &item) in bytes.iter().enumerate() {
-        let c = char::from(item);
-
-        if c == '\"' {
-            return Some((Token::Str(String::from(&s[..i])), &s[i + 1..]));
-        }
-    }
-    None
-}
-
-// Takes a string slice and returns a slice containing a word and the remainder
-fn split_first_word(s: &str) -> (&str, &str) {
-    let bytes = s.as_bytes();
-
-    for (i, &item) in bytes.iter().enumerate() {
-        let c = char::from(item);
-
-        if !c.is_alphanumeric() && c != '_' {
-            return (&s[..i], &s[i..]);
-        }
-    }
-
-    (&s[..], "")
-}
-
-//takes a string slice and returns a slice without leading whitespace
-fn skip_whitespace(s: &str) -> &str {
-    for (i, &item) in s.as_bytes().iter().enumerate() {
-        if !char::from(item).is_whitespace() {
-            return &s[i..];
-        }
-    }
-    ""
 }
 
 #[cfg(test)]
@@ -926,7 +884,7 @@ pub mod tests {
     fn tokenize_str_one_word() {
         assert_eq!(
             tokenize_str("Hello\""),
-            Some((Token::Str(String::from("Hello")), ""))
+            (Token::Str(String::from("Hello")), "")
         )
     }
 
@@ -934,7 +892,7 @@ pub mod tests {
     fn tokenize_str_two_words() {
         assert_eq!(
             tokenize_str("Hello World\""),
-            Some((Token::Str(String::from("Hello World")), ""))
+            (Token::Str(String::from("Hello World")), "")
         )
     }
 
@@ -942,18 +900,20 @@ pub mod tests {
     fn tokenize_str_words_and_remainder() {
         assert_eq!(
             tokenize_str("Hello World\"; let x = 5;"),
-            Some((Token::Str(String::from("Hello World")), "; let x = 5;"))
+            (Token::Str(String::from("Hello World")), "; let x = 5;")
         )
     }
 
     #[test]
+	#[should_panic]
     fn tokenize_str_empty() {
-        assert_eq!(tokenize_str(""), None)
+        tokenize_str("");
     }
 
     #[test]
+	#[should_panic]
     fn tokenize_not_a_string() {
-        assert_eq!(tokenize_str("let x;"), None)
+        tokenize_str("let x;");
     }
 
     // ----------- tokenize_int() tests ---------- \\
@@ -968,78 +928,6 @@ pub mod tests {
     #[test]
     fn tokenize_not_an_int() {
         assert_eq!(tokenize_int("let x = 5;"), None)
-    }
-
-    // ----------- skip_whitespace() tests ---------- \\
-    #[test]
-    fn skip_whitespace_empty() {
-        assert_eq!(skip_whitespace(""), "")
-    }
-
-    #[test]
-    fn skip_whitespace_no_whitespace() {
-        assert_eq!(skip_whitespace("HelloWorld"), "HelloWorld")
-    }
-
-    #[test]
-    fn skip_whitespace_proper_sentence() {
-        assert_eq!(
-            skip_whitespace("The mitochondria is the powerhouse of the cell!"),
-            "The mitochondria is the powerhouse of the cell!"
-        )
-    }
-
-    #[test]
-    fn skip_whitespace_single_space() {
-        assert_eq!(skip_whitespace(" word"), "word")
-    }
-
-    #[test]
-    fn skip_whitespace_many_spaces() {
-        assert_eq!(skip_whitespace("       word"), "word")
-    }
-
-    #[test]
-    fn skip_whitespace_tabs() {
-        assert_eq!(skip_whitespace("		word"), "word")
-    }
-
-    #[test]
-    fn skip_whitespace_newlines() {
-        assert_eq!(
-            skip_whitespace(
-                "
-
-
-
-                            word"
-            ),
-            "word"
-        )
-    }
-
-    // ----------- split_first_word() tests ---------- \\
-    #[test]
-    fn get_one_word() {
-        assert_eq!(split_first_word("Hello World"), ("Hello", " World"));
-    }
-
-    #[test]
-    fn get_no_word_1() {
-        assert_eq!(split_first_word(""), ("", ""));
-    }
-
-    #[test]
-    fn get_no_word_2() {
-        assert_eq!(split_first_word(" "), ("", " "));
-    }
-
-    #[test]
-    fn get_no_word_3() {
-        let s = " cant touch this";
-        for _ in 0..100 {
-            assert_eq!(split_first_word(s), ("", s));
-        }
     }
 
     // ----------------- ordererd chunk tests ------------------ \\
@@ -1059,8 +947,8 @@ pub mod tests {
 			make_chunk("->()"),
 			Some(OrderedChunk {
 				alphanumerics: "",
-				symbols: "->()",
-				remainder: "",
+				symbols: "->",
+				remainder: "()",
 			}))
 	}
 
@@ -1108,6 +996,17 @@ pub mod tests {
 
 		let chunk = make_chunk(chunk.unwrap().remainder);
 		assert_eq!(chunk, None);
+	}
+
+	#[test]
+	fn make_chunk_string() {
+		assert_eq!(
+			make_chunk("\"Hello World\""),
+			Some(OrderedChunk {
+				alphanumerics: "",
+				symbols: "\"",
+				remainder: "Hello World\"",
+			}))
 	}
 
     // ----------------- tokenize while tests ------------------ \\
