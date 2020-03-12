@@ -57,6 +57,45 @@ pub mod tokenizer {
     }
 }
 
+#[derive(Debug, Eq, PartialEq)]
+struct OrderedChunk<'a> {
+	alphanumerics: &'a str,
+	symbols: &'a str,
+	remainder: &'a str,
+}
+
+fn make_chunk(input: &str) -> Option<OrderedChunk> {
+	if input == "" { return None; }
+	let (mut start, bytes) = (0, input.as_bytes());
+
+	while start < bytes.len()
+		&& char::from(bytes[start]).is_whitespace() {
+			start += 1;
+	}
+	if start == bytes.len() { return None; }
+
+	let mut anum = start;
+	while anum < bytes.len()
+		&& (char::from(bytes[anum]).is_alphanumeric()
+		|| char::from(bytes[anum]) == '_') {
+			anum += 1;
+	}
+
+	let mut sym = anum;
+	while sym < bytes.len()
+		&& !(char::from(bytes[sym]).is_alphanumeric()
+		|| char::from(bytes[sym]) == '_'
+		|| char::from(bytes[sym]).is_whitespace()) {
+			sym += 1;
+	}
+
+	Some(OrderedChunk {
+		alphanumerics: &input[start..anum],
+		symbols: &input[anum..sym],
+		remainder: &input[sym..],
+	})
+}
+
 fn tokenize_int(word: &str) -> Option<Token> {
 	let word = word.replace("_", "");
     match word.parse::<i32>() {
@@ -1003,8 +1042,73 @@ pub mod tests {
         }
     }
 
+    // ----------------- ordererd chunk tests ------------------ \\
+	#[test]
+	fn make_chunk_empty() {
+		assert_eq!(make_chunk(""), None)
+	}
 
+	#[test]
+	fn make_chunk_whitespace() {
+		assert_eq!(make_chunk(" "), None)
+	}
 
+	#[test]
+	fn make_chunk_symbol() {
+		assert_eq!(
+			make_chunk("->()"),
+			Some(OrderedChunk {
+				alphanumerics: "",
+				symbols: "->()",
+				remainder: "",
+			}))
+	}
+
+	#[test]
+	fn make_chunk_word() {
+		assert_eq!(
+			make_chunk("word"),
+			Some(OrderedChunk {
+				alphanumerics: "word",
+				symbols: "",
+				remainder: "",
+			}))
+	}
+
+	#[test]
+	fn make_chunk_underscore() {
+		assert_eq!(
+			make_chunk("_"),
+			Some(OrderedChunk {
+				alphanumerics: "_",
+				symbols: "",
+				remainder: "",
+			}))
+	}
+
+	#[test]
+	fn make_chunk_remainder() {
+		let chunk = make_chunk(" Hello.World ");
+		assert_eq!(
+			chunk,
+			Some(OrderedChunk {
+				alphanumerics: "Hello",
+				symbols: ".",
+				remainder: "World ",
+			}));
+
+		let chunk = make_chunk(chunk.unwrap().remainder);
+		assert_eq!(
+			chunk,
+			Some(OrderedChunk {
+				alphanumerics: "World",
+				symbols: "",
+				remainder: " ",
+			}));
+
+		let chunk = make_chunk(chunk.unwrap().remainder);
+		assert_eq!(chunk, None);
+	}
 
     // ----------------- tokenize while tests ------------------ \\
     #[test]
