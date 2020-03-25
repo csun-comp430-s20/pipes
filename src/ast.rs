@@ -1,5 +1,29 @@
-use std::collections::HashMap;
 use crate::token::Type;
+
+enum Statement {
+	Assignment(Var, Exp),
+	Return(Exp),
+	If(IfStatement),
+	For(ForStatement),
+	While(WhileStatement),
+}
+
+struct IfStatement {
+	condition: Exp,
+	true_branch: Vec<Statement>,
+	false_branch: Option<Vec<Statement>>,
+}
+
+struct ForStatement {
+	iter: Var,
+	list: ListDef,
+	block: Vec<Statement>,
+}
+
+struct WhileStatement {
+	condition: Exp,
+	block: Vec<Statement>,
+}
 
 enum Exp {
 	Var(Var),
@@ -18,7 +42,7 @@ enum Exp {
 
 struct StructDef {
 	name: String,
-	field: Vec<HashMap<Var, Option<Exp>>>,
+	field: Vec<Var>,
 }
 
 struct ListDef {
@@ -34,6 +58,7 @@ struct HOF {
 struct Var {
 	name: String,
 	type: Type,
+	value: Option<Exp>,
 }
 
 struct Op {
