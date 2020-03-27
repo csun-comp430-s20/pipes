@@ -1007,7 +1007,7 @@ pub mod tests {
 		// 1+2
 			let tokens = tokenize("1+2");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::Add ,left(Exp::Int(1)),  right(Exp::Int(2)))
+			ast(OP(Operation::Add ,left(Exp::Int(1)),  right(Exp::Int(2)))))
 				
 	 }
 	
@@ -1015,7 +1015,7 @@ pub mod tests {
 	 fn parser_substract_two_ints(){
 			let tokens = tokenize("4-2");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::Subtract ,left(Exp::Int(4)),  right(Exp::Int(2)))
+			ast(OP(Operation::Subtract ,left(Exp::Int(4)),  right(Exp::Int(2)))))
 				
 	 } 
 
@@ -1023,7 +1023,7 @@ pub mod tests {
 	 fn parser_multiply_two_ints(){
 			let tokens = tokenize("2*5");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::Multiply ,left(Exp::Int(2)),  right(Exp::Int(5)))
+			ast(OP(Operation::Multiply ,left(Exp::Int(2)),  right(Exp::Int(5)))))
 				
 	 }
 
@@ -1031,7 +1031,7 @@ pub mod tests {
 	 fn parser_divide_two_ints(){
 			let tokens = tokenize("2/2");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::Divide ,left(Exp::Int(2)),  right(Exp::Int(2)))
+			ast(OP(Operation::Divide ,left(Exp::Int(2)),  right(Exp::Int(2)))))
 				
 	 }
 
@@ -1039,7 +1039,7 @@ pub mod tests {
 	 fn parser_modulo_two_ints(){
 			let tokens = tokenize("4 % 2");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::Modulo ,left(Exp::Int(4)),  right(Exp::Int(2)))
+			ast(OP(Operation::Modulo ,left(Exp::Int(4)),  right(Exp::Int(2)))))
 				
 	 }
 
@@ -1047,7 +1047,7 @@ pub mod tests {
 	 fn parser_great_than_two_ints(){
 			let tokens = tokenize("3 > 2");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::GreaterThan ,left(Exp::Int(3)),  right(Exp::Int(2)))
+			ast(OP(Operation::GreaterThan ,left(Exp::Int(3)),  right(Exp::Int(2)))))
 				
 	 }
 
@@ -1055,7 +1055,7 @@ pub mod tests {
 	 fn parser_less_than_two_ints(){
 			let tokens = tokenize("3 < 5");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::LessThan ,left(Exp::Int(3)),  right(Exp::Int(5)))
+			ast(OP(Operation::LessThan ,left(Exp::Int(3)),  right(Exp::Int(5)))))
 				
 	 }
 
@@ -1063,14 +1063,14 @@ pub mod tests {
 	 fn parser_great_equal_two_ints(){
 			let tokens = tokenize("3 >= 2");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::GreaterEqual ,left(Exp::Int(3)),  right(Exp::Int(2)))
+			ast(OP(Operation::GreaterEqual ,left(Exp::Int(3)),  right(Exp::Int(2)))))
 				
 	 }
 	 #[test]
 	 fn parser_less_equal_two_ints(){
 			let tokens = tokenize("3 <= 4");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::LessEqual ,left(Exp::Int(3)),  right(Exp::Int(4)))
+			ast(OP(Operation::LessEqual ,left(Exp::Int(3)),  right(Exp::Int(4)))))
 				
 	 }
 
@@ -1078,7 +1078,7 @@ pub mod tests {
 	 fn parser_equal_two_ints(){
 			let tokens = tokenize("3 == 3");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::Equal ,left(Exp::Int(3)),  right(Exp::Int(3)))
+			ast(OP(Operation::Equal ,left(Exp::Int(3)),  right(Exp::Int(3)))))
 				
 	 }
 
@@ -1086,7 +1086,7 @@ pub mod tests {
 	 fn parser_not_equal_two_ints(){
 			let tokens = tokenize("3 != 2");
 			assert_eq!(parse(tokens),
-			ast(OP(Operation::NotEqual ,left(Exp::Int(3)),  right(Exp::Int(2)))
+			ast(OP(Operation::NotEqual ,left(Exp::Int(3)),  right(Exp::Int(2)))))
 				
 	 } 
 
@@ -1097,7 +1097,7 @@ pub mod tests {
 		let tokens = tokenize("let x: Int = 1;");
 			assert_eq!(parse(tokens),
 			ast(Statement::Assignment(Exp::Var(Var { name: String::from("x"), type: Type::Int, value: None }), 
-			Exp::Int((1))	
+			Exp::Int(1)))	
 		   )
 	 }
 				
