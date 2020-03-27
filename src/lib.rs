@@ -1,4 +1,5 @@
 mod token;
+
 use crate::token::*;
 
 pub mod tokenizer {
@@ -997,5 +998,105 @@ pub mod tests {
         for _ in 0..100 {
             assert_eq!(split_first_word(s), ("", s));
         }
-    }
-}
+	}
+	// ================== Some parser tests==================
+
+	//Operation tests
+	#[test]
+	fn parser_add_two_ints(){
+		// 1+2
+			let tokens = tokenize("1+2");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::Add ,left(Exp::Int(1)),  right(Exp::Int(2)))
+				
+	 }
+	
+	 #[test]
+	 fn parser_substract_two_ints(){
+			let tokens = tokenize("4-2");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::Subtract ,left(Exp::Int(4)),  right(Exp::Int(2)))
+				
+	 } 
+
+	 #[test]
+	 fn parser_multiply_two_ints(){
+			let tokens = tokenize("2*5");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::Multiply ,left(Exp::Int(2)),  right(Exp::Int(5)))
+				
+	 }
+
+	 #[test]
+	 fn parser_divide_two_ints(){
+			let tokens = tokenize("2/2");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::Divide ,left(Exp::Int(2)),  right(Exp::Int(2)))
+				
+	 }
+
+	 #[test]
+	 fn parser_modulo_two_ints(){
+			let tokens = tokenize("4 % 2");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::Modulo ,left(Exp::Int(4)),  right(Exp::Int(2)))
+				
+	 }
+
+	 #[test]
+	 fn parser_great_than_two_ints(){
+			let tokens = tokenize("3 > 2");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::GreaterThan ,left(Exp::Int(3)),  right(Exp::Int(2)))
+				
+	 }
+
+	 #[test]
+	 fn parser_less_than_two_ints(){
+			let tokens = tokenize("3 < 5");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::LessThan ,left(Exp::Int(3)),  right(Exp::Int(5)))
+				
+	 }
+
+	 #[test]
+	 fn parser_great_equal_two_ints(){
+			let tokens = tokenize("3 >= 2");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::GreaterEqual ,left(Exp::Int(3)),  right(Exp::Int(2)))
+				
+	 }
+	 #[test]
+	 fn parser_less_equal_two_ints(){
+			let tokens = tokenize("3 <= 4");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::LessEqual ,left(Exp::Int(3)),  right(Exp::Int(4)))
+				
+	 }
+
+	 #[test]
+	 fn parser_equal_two_ints(){
+			let tokens = tokenize("3 == 3");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::Equal ,left(Exp::Int(3)),  right(Exp::Int(3)))
+				
+	 }
+
+	 #[test]
+	 fn parser_not_equal_two_ints(){
+			let tokens = tokenize("3 != 2");
+			assert_eq!(parse(tokens),
+			ast(OP(Operation::NotEqual ,left(Exp::Int(3)),  right(Exp::Int(2)))
+				
+	 } 
+
+
+	 #[test]
+	 // let x: Int = 1;
+	 fn parser_int_variable_assignment(){
+		let tokens = tokenize("let x: Int = 1;");
+			assert_eq!(parse(tokens),
+			ast(Statement::Assignment(Exp::Var(Var { name: String::from("x"), type: Type::Int, value: None }), 
+			Exp::Int((1))	
+		   )
+	 }
