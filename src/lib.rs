@@ -1,4 +1,5 @@
 mod token;
+mod ast;
 
 use crate::token::*;
 
@@ -998,7 +999,6 @@ pub mod tests {
         for _ in 0..100 {
             assert_eq!(split_first_word(s), ("", s));
         }
-	}
 	// ================== Some parser tests==================
 
 	//Operation tests
@@ -1100,3 +1100,103 @@ pub mod tests {
 			Exp::Int((1))	
 		   )
 	 }
+				
+    //======================PARSER TESTS======================\\
+
+    //Integer assignment with order of operations
+    #[test]
+    fn parse_int_assign_1() {
+	let tokens = tokenize("let x: int = 1 + 2;");
+	assert_eq!(parse(tokens), 
+		   ast(Assignment(Exp::Var(Var { name: String::from("x"), Type::Int, value: None }), 
+		   Op(Operation::Add, left(Exp::Int(1)), right(Exp::Int(2))))));
+    }
+
+    #[test]
+    fn parse_int_assign_2() {
+	let tokens = tokenize("let x: int = 1 - 2;");
+	assert_eq!(parse(tokens), 
+		   ast(Assignment(Exp::Var(Var { name: String::from("x"), Type::Int, value: None }), 
+		   Op(Operation::Minus, left(Exp::Int(1)), right(Exp::Int(2))))));
+    }
+
+    #[test]
+    fn parse_int_assign_3() {
+	let tokens = tokenize("let x: int = 4 * 5;");
+	assert_eq!(parse(tokens), 
+		   ast(Assignment(Exp::Var(Var { name: String::from("x"), Type::Int, value: None }), 
+		   Op(Operation::Multiply, left(Exp::Int(4)), right(Exp::Int(5))))));
+    }
+
+    #[test]
+    fn parse_int_assign_4() {
+	let tokens = tokenize("let x: int = 9 / 3;");
+	assert_eq!(parse(tokens), 
+		   ast(Assignment(Exp::Var(Var { name: String::from("x"), Type::Int, value: None }), 
+		   Op(Operation::Divide, left(Exp::Int(9)), right(Exp::Int(3))))));
+    }
+
+    #[test]
+    fn parse_int_assign_5() {
+	let tokens = tokenize("let x: int = 1 + 2 * 3;");
+	assert_eq!(parse(tokens), 
+		   ast(Assignment(Exp::Var(Var { name: String::from("x"), Type::Int, value: None }), 
+		   Op(Operation::Add, left(Exp::Int(1)), 
+		   right(OP(Operation::Multiply, left(Exp::Int(2)), right(Exp::Int(3))))))));
+    }
+
+    #[test]
+    fn parse_int_assign_6() {
+	let tokens = tokenize("let x: int = 2 * 3 + 8 / 2;");
+	assert_eq!(parse(tokens), 
+		   ast(Assignment(Exp::Var(Var { name: String::from("x"), Type::Int, value: None }), 
+		   Op(Operation::Operation::Add, 
+		   left(Op(Operation::Multiply, left(Exp::Int(2)), right(Exp::Int(3)))), 
+		   right(Op(Operation::Divide, left(Exp::Int(8)), right(Exp::Int(2))))))));
+    }
+
+    //String assignments
+    #[test]
+    fn parse_str_assign() {
+	let tokens = tokenize("let x: str = \"Hello World!\";");
+	assert_eq!(parse(tokens), 
+		   ast(Assignment(Exp::Var(Var { name: String::from("x"), Type::Str, value: None }), 
+		   Str("Hello World!"))));
+    }
+
+    //While loop tests
+    #[test]
+    fn parse_while() {
+	let tokens = tokenize("while (x <= 9) { return true; }");
+	assert_eq!(parse(tokens), 
+		   ast(While(Op(Operation::LessEqual, left(Exp::Var(x)), right(Exp::Int(9))))), 
+		   Return(Exp::Bool(true)));
+    }
+
+    //For loop tests
+    #[test]
+    fn parse_for_loop() {
+	let tokens = tokenize("for x in(9)");
+	assert_eq!(parse(tokens), 
+		   ast(For(iter(Var::Var(Var { name: String::from("x"), Type::Int, value: 0 })), 
+		   list(ListDef::Type(Type::Int)))));
+    }
+
+    //If Else tests
+    #[test]
+    fn parse_if() {
+	let tokens = tokenize("if (x < 5) { return true; }");
+	assert_eq!(parse(tokens), 
+		   ast(If(condition(Exp::Op(Operation::LessThan, left(Exp::Var(x)), right(Exp::Int(5)))), 
+		   true_branch(Return(Exp::Bool(true))))));
+    }
+
+    #[test]
+    fn parse_if_else() {
+	let tokens = tokenize("if (x < 5) { return true; } else { return false; }");
+	assert_eq!(parse(tokens), 
+		   ast(If(condition(Exp::Op(Operation::LessThan, left(Exp::Var(x)), right(Exp::Int(5)))), 
+		   true_branch(Return(Exp::Bool(true))), 
+		   flase_branch(Return(Exp::Bool(false))))));
+    }
+}
