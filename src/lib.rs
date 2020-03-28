@@ -10,7 +10,7 @@ pub mod tokenizer {
         let mut input = input;
 
 		while let Some(chunk) = make_chunk(input) {
-			// it'd be easier to tokenize string here
+			input = chunk.remainder;
 			if let Some(tk) = tokenize_int(chunk.alphanumerics) {
 				tokens.push(tk);
 			} else if let Some(tk) = tokenize_word(chunk.alphanumerics) {
@@ -30,16 +30,25 @@ pub mod tokenizer {
 					tokenize_symbol(&chunk.symbols[1..])) {
 				tokens.push(tk1);
 				tokens.push(tk2);
+			} else if let (Some(tk), "\"") = (
+					tokenize_symbol(&chunk.symbols[..1]),
+					&chunk.symbols[1..]) {
+				tokens.push(tk);
+				let (tk, rem) = tokenize_str(chunk.remainder);
+				input = rem;
+				tokens.push(tk);
+			} else if let ("\"", s) = (&chunk.symbols[..1], &chunk.symbols[1..]) {
+				if let (Token::Str(mut tk), rem) = tokenize_str(chunk.remainder) {
+					input = rem;
+					tk.insert_str(0, s);
+					tokens.push(Token::Str(tk));
+				}
+			} else if chunk.symbols == "\"" {
+				let (tk, rem) = tokenize_str(chunk.remainder);
+				input = rem;
+				tokens.push(tk);
 			} else {
 				panic!("Failed to tokenize '{}' as symbol", chunk.symbols);
-			}
-
-			input = if !chunk.remainder.is_empty() && &chunk.remainder[..1] == "\"" {
-				let (tk, rem) = tokenize_str(&chunk.remainder[1..]);
-				tokens.push(tk);
-				rem
-			} else {
-				chunk.remainder
 			}
 		}
 		tokens
@@ -74,7 +83,6 @@ fn make_chunk(input: &str) -> Option<OrderedChunk> {
 	while sym < bytes.len() && sym < anum + 2
 		&& !(char::from(bytes[sym]).is_alphanumeric()
 		|| char::from(bytes[sym]) == '_'
-		|| char::from(bytes[sym]) == '\"'
 		|| char::from(bytes[sym]).is_whitespace()) {
 			sym += 1;
 	}
