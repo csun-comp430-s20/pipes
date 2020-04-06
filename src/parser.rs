@@ -1,4 +1,4 @@
-
+/*
 
 	// ================== Some parser tests==================
 
@@ -197,3 +197,4 @@
            true_branch(Return(Exp::Bool(true))), 
            flase_branch(Return(Exp::Bool(false))))));
     }
+*/
