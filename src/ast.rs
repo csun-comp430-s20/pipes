@@ -65,3 +65,4 @@ pub enum Token {
     Equal,        // ==
     NotEqual,     // !=
 }
+

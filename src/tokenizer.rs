@@ -1,64 +1,56 @@
-mod token;
-use crate::token::*;
+use crate::ast::{Token, Type};
 
-pub mod tokenizer {
-    use super::*;
-    pub use crate::token::*;
+pub fn tokenize(input: &str) -> Vec<Token> {
+    let mut tokens: Vec<Token> = vec![];
+    let mut input = input;
 
-    pub fn tokenize(input: &str) -> Vec<Token> {
-        let mut tokens: Vec<Token> = vec![];
-        let mut input = input;
+    while input != "" {
+        input = skip_whitespace(input);
+        let cursor = char::from(input.as_bytes()[0]);
 
-        while input != "" {
-            input = skip_whitespace(input);
-			if input == "" { return tokens; }
-            let cursor = char::from(input.as_bytes()[0]);
-
-            if cursor == '\"' {
-                if let Some((token, remainder)) = tokenize_str(&input[1..]) {
-                    tokens.push(token);
-                    input = remainder;
-                } else {
-                    panic!("No closing double-quote: {}", input)
-                }
-            } else if cursor.is_alphanumeric() || cursor == '_' {
-                let (candidate, remainder) = split_first_word(input);
-                if let Some(token) = tokenize_int(candidate) {
-                    tokens.push(token);
-                    input = remainder;
-                } else {
-                    tokens.push(tokenize_word(candidate));
-                    input = remainder;
-                }
+        if cursor == '\"' {
+            if let Some((token, remainder)) = tokenize_str(&input[1..]) {
+                tokens.push(token);
+                input = remainder;
             } else {
-                if input.len() >= 2 {
-                    if let Some(token) = tokenize_symbol(&input[..2]) {
-                        tokens.push(token);
-                        input = &input[2..];
-                        continue;
-                    }
-                }
-
-                if input.len() >= 1 {
-                    if let Some(token) = tokenize_symbol(&input[..1]) {
-                        tokens.push(token);
-                        input = &input[1..];
-                        continue;
-                    }
-                }
-
-                if input != "" {
-                    panic!("Failed to parse: {}", input);
+                panic!("No closing double-quote: {}", input)
+            }
+        } else if cursor.is_alphanumeric() {
+            let (candidate, remainder) = split_first_word(input);
+            if let Some(token) = tokenize_int(candidate) {
+                tokens.push(token);
+                input = remainder;
+            } else {
+                tokens.push(tokenize_word(candidate));
+                input = remainder;
+            }
+        } else {
+            if input.len() >= 2 {
+                if let Some(token) = tokenize_symbol_pair(&input[..2]) {
+                    tokens.push(token);
+                    input = &input[2..];
+                    continue;
                 }
             }
-        }
 
-        tokens
+            if input.len() >= 1 {
+                if let Some(token) = tokenize_symbol(&input[..1]) {
+                    tokens.push(token);
+                    input = &input[1..];
+                    continue;
+                }
+            }
+
+            if input != "" {
+                panic!("Failed to parse: {}", input);
+            }
+        }
     }
+
+    tokens
 }
 
 fn tokenize_int(word: &str) -> Option<Token> {
-	let word = word.replace("_", "");
     match word.parse::<i32>() {
         Ok(ok) => Some(Token::Int(ok)),
         Err(_) => None,
@@ -75,7 +67,6 @@ fn tokenize_word(word: &str) -> Token {
         "in" => Token::In,
         "while" => Token::While,
 
-		"func" => Token::Function,
         "return" => Token::Return,
         "let" => Token::Let,
 
@@ -84,9 +75,6 @@ fn tokenize_word(word: &str) -> Token {
         "false" => Token::Bool(false),
 
         "int" => Token::TypeName(Type::Int),
-        "str" => Token::TypeName(Type::Str),
-        "bool" => Token::TypeName(Type::Bool),
-        "void" => Token::TypeName(Type::Void),
 
         _ => Token::Var(String::from(word)),
     }
@@ -117,15 +105,6 @@ fn tokenize_symbol(sym: &str) -> Option<Token> {
         ">" => Some(Token::GreaterThan),
         "<" => Some(Token::LessThan),
 
-        "->" => Some(Token::Output),
-        "&&" => Some(Token::And),
-        "||" => Some(Token::Or),
-
-        ">=" => Some(Token::GreaterEqual),
-        "<=" => Some(Token::LessEqual),
-        "==" => Some(Token::Equal),
-        "!=" => Some(Token::NotEqual),
-
         _ => None,
     }
 }
@@ -141,6 +120,7 @@ fn tokenize_str(s: &str) -> Option<(Token, &str)> {
             return Some((Token::Str(String::from(&s[..i])), &s[i + 1..]));
         }
     }
+
     None
 }
 
@@ -159,19 +139,38 @@ fn split_first_word(s: &str) -> (&str, &str) {
     (&s[..], "")
 }
 
+fn tokenize_symbol_pair(pair: &str) -> Option<Token> {
+    match pair {
+        "->" => Some(Token::Output),
+        "&&" => Some(Token::And),
+        "||" => Some(Token::Or),
+
+        ">=" => Some(Token::GreaterEqual),
+        "<=" => Some(Token::LessEqual),
+        "==" => Some(Token::Equal),
+        "!=" => Some(Token::NotEqual),
+
+        _ => None,
+    }
+}
+
 //takes a string slice and returns a slice without leading whitespace
 fn skip_whitespace(s: &str) -> &str {
-    for (i, &item) in s.as_bytes().iter().enumerate() {
-        if !char::from(item).is_whitespace() {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        let c = char::from(item);
+
+        if !c.is_whitespace() {
             return &s[i..];
         }
     }
-    ""
+
+    &s[..]
 }
 
 #[cfg(test)]
 pub mod tests {
-    use super::*;
     use crate::tokenizer::*;
 
     // ----------- tokenize() tests ---------- \\
@@ -212,18 +211,13 @@ pub mod tests {
     }
 
     #[test]
-    fn tokenize_keyword_function() {
-        assert_eq!(tokenize("func"), vec![Token::Function])
+    fn tokenize_keyword_return() {
+        assert_eq!(tokenize("return"), vec![Token::Return])
     }
 
     #[test]
     fn tokenize_keyword_output() {
         assert_eq!(tokenize("->"), vec![Token::Output])
-    }
-
-    #[test]
-    fn tokenize_keyword_return() {
-        assert_eq!(tokenize("return"), vec![Token::Return])
     }
 
     #[test]
@@ -261,7 +255,7 @@ pub mod tests {
         // not sure about this one
         assert_eq!(
             tokenize("struct foo"),
-            vec![Token::Struct, Token::Var(String::from("foo"))]
+            vec![Token::TypeName(Type::Struct(String::from("foo")))]
         )
     }
 
@@ -460,32 +454,30 @@ pub mod tests {
         assert_eq!(tokenize("num1"), vec![Token::Var(String::from("num1"))])
     }
 
+    // probably need to change tokenize stub, needs to return an error?
     #[test]
-    fn tokenize_weird_var_name_8() {
-        assert_eq!(tokenize("1num"), vec![Token::Var(String::from("1num"))])
-    }
-
-    #[test]
-    fn tokenize_weird_var_name_9() {
-        assert_eq!(tokenize("123_this_is_a_var"), vec![Token::Var(String::from("123_this_is_a_var"))])
-    }
-
-    #[test]
-	#[should_panic]
     fn tokenize_illegal_var_name_1() {
         assert_eq!(tokenize("&"), vec![])
     }
 
     #[test]
-	#[should_panic]
     fn tokenize_illegal_var_name_2() {
         assert_eq!(tokenize("|||"), vec![])
     }
 
     #[test]
-	#[should_panic]
     fn tokenize_illegal_var_name_3() {
         assert_eq!(tokenize("?"), vec![])
+    }
+
+    #[test]
+    fn tokenize_illegal_var_name_4() {
+        assert_eq!(tokenize("1num"), vec![])
+    }
+
+    #[test]
+    fn tokenize_illegal_var_name_5() {
+        assert_eq!(tokenize("123_this_is_a_var"), vec![])
     }
 
     // ----------- basic input tests ---------- \\
@@ -526,7 +518,7 @@ pub mod tests {
         assert_eq!(
             tokenize(
                 "
-					 1+2"
+                        1+2"
             ),
             vec![Token::Int(1), Token::Plus, Token::Int(2),]
         )
@@ -553,7 +545,7 @@ pub mod tests {
         assert_eq!(
             tokenize(
                 "1+2
-					 "
+                        "
             ),
             vec![Token::Int(1), Token::Plus, Token::Int(2),]
         )
@@ -572,8 +564,8 @@ pub mod tests {
         assert_eq!(
             tokenize(
                 "	1
-					 +
-					 2						 "
+                        +						
+                        2						 "
             ),
             vec![Token::Int(1), Token::Plus, Token::Int(2),]
         )
@@ -653,7 +645,7 @@ pub mod tests {
                 Token::Colon,
                 Token::TypeName(Type::Str),
                 Token::Assign,
-                Token::Str(String::from("Hello World!")),
+                Token::Str(String::from("Hello World")),
                 Token::Semicolon,
             ]
         )
@@ -697,15 +689,15 @@ pub mod tests {
         assert_eq!(
             tokenize(
                 "let x: foo = {
-					bar: 32,
-					baz: \"Hello World\",
-				};"
+                    bar: 32,
+                    baz: \"Hello World\",
+                };"
             ),
             vec![
                 Token::Let,
                 Token::Var(String::from("x")),
                 Token::Colon,
-                Token::Var(String::from("foo")),
+                Token::TypeName(Type::Struct(String::from("foo"))),
                 Token::Assign,
                 Token::LeftCurly,
                 Token::Var(String::from("bar")),
@@ -782,10 +774,10 @@ pub mod tests {
         assert_eq!(
             tokenize(
                 "struct Foo {
-						bar: int,
-						baz: str,
-						qux: bool,
-					}"
+                        bar: int,
+                        baz: str,
+                        qux: bool,
+                    }"
             ),
             vec![
                 Token::Struct,
@@ -813,11 +805,11 @@ pub mod tests {
         assert_eq!(
             tokenize(
                 "func bad_adder(a: int, b: int,) -> int {
-					let x: int = a;
-					let y: int = b;
-					let result: int = a + b;
-					return result;
-				}"
+                    let x: int = a;
+                    let y: int = b;
+                    let result: int = a + b;
+                    return result;
+                }"
             ),
             vec![
                 Token::Function,
@@ -837,21 +829,18 @@ pub mod tests {
                 Token::LeftCurly,
                 Token::Let,
                 Token::Var(String::from("x")),
-				Token::Colon,
                 Token::TypeName(Type::Int),
                 Token::Assign,
                 Token::Var(String::from("a")),
                 Token::Semicolon,
                 Token::Let,
                 Token::Var(String::from("y")),
-				Token::Colon,
                 Token::TypeName(Type::Int),
                 Token::Assign,
                 Token::Var(String::from("b")),
                 Token::Semicolon,
                 Token::Let,
                 Token::Var(String::from("result")),
-				Token::Colon,
                 Token::TypeName(Type::Int),
                 Token::Assign,
                 Token::Var(String::from("a")),
@@ -1002,67 +991,4 @@ pub mod tests {
             assert_eq!(split_first_word(s), ("", s));
         }
     }
-
-
-
-
-    // ----------------- tokenize while tests ------------------ \\
-    #[test]
-    fn tokenize_while_with_condition(){
-        assert_eq!(tokenize("while (x != 5){
-        return true; }"),
-        vec![
-        Token::While,
-        Token::LeftParen,
-        Token::Var(String::from("x")),
-        Token::NotEqual,
-        Token::Int(5),
-        Token::RightParen,
-        Token::LeftCurly,
-        Token::Return,
-        Token::Bool(true),
-        Token::Semicolon,
-        Token::RightCurly,]);
-
-        }
-
-    // ----------------- tokenize for loop tests ------------------ \\
-    #[test]
-    fn tokenize_for_loop(){
-        assert_eq!(tokenize("for items in list return items"),
-        vec![
-        Token::For,
-        Token::Var(String::from("items")),
-        Token::In,
-        Token::Var(String::from("list")),
-        Token::Return,
-        Token::Var(String::from("items")),]);
-    }
-
-    // ----------------- tokenize if else tests ------------------ \\
-    #[test]
-    fn tokenize_if_else(){
-        assert_eq!(tokenize("if(x = 1){
-                             y = true;
-                         } else y = false;"),
-        vec![
-        Token::If,
-        Token::LeftParen,
-        Token::Var(String::from("x")),
-        Token::Assign,
-        Token::Int(1),
-        Token::RightParen,
-        Token::LeftCurly,
-        Token::Var(String::from("y")),
-        Token::Assign,
-        Token::Bool(true),
-        Token::Semicolon,
-        Token::RightCurly,
-        Token::Else,
-        Token::Var(String::from("y")),
-        Token::Assign,
-        Token::Bool(false),
-        Token::Semicolon]);
-    }
-
 }
