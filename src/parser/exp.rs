@@ -1,3 +1,5 @@
+use crate::types::Type;
+
 pub enum Exp {
     Var(Box<Var>),
     Int(i32),
