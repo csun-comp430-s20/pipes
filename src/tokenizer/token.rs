@@ -1,3 +1,5 @@
+use crate::types::Type;
+
 #[derive(Debug, Eq, PartialEq)]
 pub enum Token {
     If,   // if

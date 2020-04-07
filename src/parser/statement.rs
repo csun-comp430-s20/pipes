@@ -6,7 +6,6 @@ pub enum Statement {
     If(IfStatement),
     For(ForStatement),
     While(WhileStatement),
-    LoneExp(Exp),
 }
 
 pub struct IfStatement {

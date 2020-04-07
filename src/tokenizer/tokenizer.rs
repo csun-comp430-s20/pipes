@@ -1,4 +1,4 @@
-use super::Token;
+use super::token::Token;
 use crate::types::Type;
 
 pub fn tokenize(input: &str) -> Vec<Token> {
