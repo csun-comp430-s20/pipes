@@ -1,4 +1,4 @@
-use crate::parser::exp::{Exp, Var, ListDef};
+use crate::ast::exp::{Exp, Var, ListDef};
 
 pub enum Statement {
     Assignment(Var, Exp),
