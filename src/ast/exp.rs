@@ -6,28 +6,14 @@ pub enum Exp {
     Str(String),
     Bool(bool),
 
+	Call(String, Vec<Var>, Box<Var>),
     Negate(Box<Exp>),
-    Op(Box<Op>),
+    Op(Operation, Box<Exp>, Box<Exp>),
 
     // the hard stuff
-    Struct(StructDef),
-    List(ListDef),
-    HigherOrderFunction(Box<HOF>),
-}
-
-pub struct StructDef {
-    name: String,
-    field: Vec<Var>,
-}
-
-pub struct ListDef {
-    list_type: Type,
-    item: Vec<Exp>,
-}
-
-pub struct HOF {
-    param: Var,
-    output: Exp,
+    Struct(String, Vec<Var>),
+    List(Type, Vec<Exp>),
+    HOF(Box<Var>, Box<Exp>),
 }
 
 pub struct Var {
@@ -36,11 +22,6 @@ pub struct Var {
     value: Option<Exp>,
 }
 
-pub struct Op {
-    op: Operation,
-    left: Exp,
-    right: Exp,
-}
 pub enum Operation {
     Add,
     Subtract,

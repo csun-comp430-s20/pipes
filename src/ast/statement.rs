@@ -1,11 +1,20 @@
-use crate::ast::exp::{Exp, Var, ListDef};
+use crate::types::Type;
+use crate::ast::{Exp, Var};
 
 pub enum Statement {
     Assignment(Var, Exp),
+	Function(Function),
     Return(Exp),
     If(IfStatement),
     For(ForStatement),
     While(WhileStatement),
+}
+
+pub struct Function {
+	name: String,
+	param: Vec<Var>,
+	output: Var,
+	block: Vec<Statement>,
 }
 
 pub struct IfStatement {
@@ -16,7 +25,7 @@ pub struct IfStatement {
 
 pub struct ForStatement {
     iter: Var,
-    list: ListDef,
+    list: (Type, Vec<Exp>),
     block: Vec<Statement>,
 }
 
