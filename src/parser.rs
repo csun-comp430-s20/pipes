@@ -29,6 +29,15 @@ fn try_parse_stmt(input: Vec<Token>) -> ParseResult<Statement> {
 }
 
 fn try_parse_exp(input: Vec<Token>) -> ParseResult<Exp> {
+	let e = match &input[0] {
+		Token::Int(i) => Exp::Int(*i),
+		Token::Str(s) => Exp::Str(s.clone()),
+		Token::Bool(b) => Exp::Bool(*b),
+		Token::Var(name) => parse_variable(input)?,
+
+		Token::
+		_ => return Err("Couldn't parse expression")
+	};
 	// try primary (var, int, str, bool)
 	// try operation
 	// try data structure
