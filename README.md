@@ -1,13 +1,20 @@
-# Pipes
+# Pipes 
+## Team Members
+    Nicholas Warfield
+    Andrew Alarcon
+    Elena Adame
+    Maxwell Plotkin
+    Sai Pappu
 
-Pipes seeks to operate on large datasets efficiently. The use of pipes, hence the name, along with vector based operatios helps users to focus of data and its structures. Pipes compiles into Web Assembly. 
+##  Design Philosophy 
 
-## Compiler 
+## Code Snippets
 
-The compiler for Pipes is written in rust. 
+## Limitations
 
-## Non-Trivial Features 
+## Lessons Learned 
 
-Higher Order Functions, Vector-based operations, and  expressions. 
+## Compilation Process
 
+## Formal Language Defenition
 
