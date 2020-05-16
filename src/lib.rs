@@ -1,6 +1,6 @@
 #![feature(box_patterns)]
-mod parser;
-mod tokenizer;
-mod ast;
-mod types;
-mod type_checker;
+pub mod parser;
+pub mod tokenizer;
+pub mod ast;
+pub mod types;
+pub mod type_checker;

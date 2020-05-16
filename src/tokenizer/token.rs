@@ -1,6 +1,6 @@
 use crate::types::Type;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Token {
     If,   // if
     Elif, // elif
