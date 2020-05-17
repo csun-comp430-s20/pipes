@@ -40,11 +40,11 @@ Creating a function
 
     func bad_adder(a: int, b: int,) -> int
         {
-	                let x: int = a;
-					let y: int = b;
-					let result: int = a + b;
-					return result;
-				}
+	        let x: int = a;
+		let y: int = b;
+		let result: int = a + b;
+		return result;
+	 }
 
 Callning a function
 
@@ -54,6 +54,15 @@ Creating a while loop
 
     while (x != 5){
         return true; 
+
+Creating if-else loop
+
+	if (x < 5) 
+	    { return true; }
+	else
+	    { return false; }
+
+
 
 Creating for loop
 
