@@ -8,6 +8,8 @@
 
 ##  Design Philosophy 
 
+Pipes was picked because our team wanted something other than object oriented programming languages. The goal was to highlight expressions and vector data types. The main focus of Pipes is data, how it is stored, manipulated, and used to help user’s solve problems. This language might solve anything involving big data. Whether there is a long list of coordinates that need to be extrapolated or vector operations in complex mathematics operations, Pipes seeks to operate over these kinds of datasets efficiently. 
+
 ## Code Snippets
 
  Creating a  interger type variable.
@@ -61,6 +63,8 @@ Creating for loop
 ## Limitations
 
 ## Lessons Learned 
+
+If we had to do this all over, we probably would have made less ambitious decisions. The fact that our group had conflicting schedules and some of us worked full time, proved to be really difficult at the beginning to meet freely outside of class. This limited the amount of pair programming we could do, which probably would have been helpful for those of us less experienced. As far as language design goes, there is not much that we would change. We wanted a language focused on data and we all agreed that this would be the most interesting. With COVID-19, we had to choose a different target language regardless. Instead of web assembly we chose LLVM, because it would be simpler. Not only this but LLVM has more documentation available. 
 
 ## Compilation Process
 
