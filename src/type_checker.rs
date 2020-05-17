@@ -45,109 +45,101 @@ pub mod tests {
 	#[test]
 	//  let x:int = 1;	
 	fn type_check_int_var(){
-		let token = tokenizer("let x: int = 1;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("let x: int = 1;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 
 	#[test]
 	//  5+1;	
 	fn type_check_int_add_operation(){
-		let token = tokenizer("5+1;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("5+1;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 	#[test]
 	// 4-2
 	fn type_check_int_substract_operation(){
-		let token = tokenizer("4-2;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("4-2;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 
 	#[test]
 	fn type_check_int_modulo_operation(){
-		let token = tokenizer("10%2;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("10%2;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 	
 	#[test]
 	fn type_check_int_divide_operation(){
-		let token = tokenizer("4/2;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("4/2;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 
 	#[test]
 	fn type_check_int_multiply_operation(){
-		let token = tokenizer("3*3;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("3*3;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 	
 	#[test]
 	// let x: int = 1 + 2;
 	fn type_check_int_var_add(){
-		let token = tokenizer("let x: int = 1 + 2;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("let x: int = 1 + 2;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 
 	#[test]
 	// let x: int = 3 - 2;
 	fn type_check_int_var_substract(){
-		let token = tokenizer("let x: int = 3 - 2;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("let x: int = 3 - 2;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 	#[test]
 	// let x: int = 9 / 3;
 	fn type_check_int_var_divide(){
-		let token = tokenizer("let x: int = 9 / 3;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("let x: int = 9 / 3;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 
 	#[test]
 	// let x: int = 4 % 2;
 	fn type_check_int_var_modulo(){
-		let token = tokenizer("let x: int = 4 % 2;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("let x: int = 4 % 2;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 
 	#[test]
 	// let x: int = 2 * 3 + 8 / 2;
 	fn type_check_int_var_multiple_operations(){
-		let token = tokenizer("let x: int = 2 * 3 + 8 / 2;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("let x: int = 2 * 3 + 8 / 2;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
 
 	#[test]
 	// for x in(9)
 	fn type_check_int_for_loop(){
-		let token = tokenizer("for x in(9);");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("for x in(9);");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Int);
 	}
-
-	
-
-
 
 	#[test]
 	// let s: str = "Hi!"
 	fn type_check_str_assign(){
-		let token = tokenizer("let s: str = Hi!;");
-		let parsed = parser(token);
-		assert_eq!(parsed, type_check(parsed: Int));
+		let token = tokenize("let s: str = Hi!;");
+		let parsed = parse(token);
+		assert_eq!(type_check(parsed), Type:: Str);
 	}
-
-
-
-
 
 
 }
