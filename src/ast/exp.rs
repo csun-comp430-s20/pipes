@@ -1,5 +1,6 @@
 use crate::types::Type;
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Exp {
     Var(Box<Var>),
     Int(i32),
@@ -16,12 +17,14 @@ pub enum Exp {
     HOF(Box<Var>, Box<Exp>),
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Var {
     name: String,
     var_type: Type,
     value: Option<Exp>,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Operation {
     Add,
     Subtract,
